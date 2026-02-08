@@ -48,15 +48,15 @@ export default function HomeScreen() {
           {/* Additional Resources */}
           <View className="gap-3 mt-2">
             <TouchableOpacity
-              onPress={() => router.push("/glossary")}
+              onPress={() => router.push("/glossary-expanded")}
               className="bg-surface rounded-2xl p-4 border border-border active:opacity-80"
               style={{ backgroundColor: "#E8F4F8" }}
             >
               <View className="flex-row items-center justify-between">
-                <Text className="text-lg font-semibold text-foreground flex-1">用語辞典</Text>
+                <Text className="text-lg font-semibold text-foreground flex-1">用語辞典（127個）</Text>
                 <Text className="text-sm text-muted">→</Text>
               </View>
-              <Text className="text-xs text-muted mt-1">卓球用語を詳しく学ぶ</Text>
+              <Text className="text-xs text-muted mt-1">ルール・道具・技術・戦術など全て</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => router.push("/core-training")}
