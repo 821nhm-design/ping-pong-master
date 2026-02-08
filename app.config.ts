@@ -32,7 +32,7 @@ const env = {
   appSlug: "ping-pong-master",
   // S3 URL of the app logo - set this to the URL returned by generate_image when creating custom logo
   // Leave empty to use the default icon from assets/images/icon.png
-  logoUrl: "",
+  logoUrl: "https://private-us-east-1.manuscdn.com/sessionFile/nZqnYQHEyVi1G5VDr1amYG/sandbox/VwRZzoHC1mW4SIj9Zkx8bh-img-1_1770531927000_na1fn_aWNvbg.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvblpxbllRSEV5VmkxRzVWRHIxYW1ZRy9zYW5kYm94L1Z3Ulp6b0hDMW1XNFNJajlaa3g4YmgtaW1nLTFfMTc3MDUzMTkyNzAwMF9uYTFmbl9hV052YmcucG5nP3gtb3NzLXByb2Nlc3M9aW1hZ2UvcmVzaXplLHdfMTkyMCxoXzE5MjAvZm9ybWF0LHdlYnAvcXVhbGl0eSxxXzgwIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzk4NzYxNjAwfX19XX0_&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=t6Xs~5Nr1FsQ9gnA5-IkySmSUePkkYAyJy1KPkuPWrrtITTLCpVwAinPEu-QZL21iau00siQPYz~Ih9I3CnhAA~Wmgd6H8Z77qbgPG7qatZjFn92FkAZ-OUvZbzdZI11mXaOiMGPhxBJjrtY4HcIoH3rywIHuujHlgSsH54uij7Ocb4bUccJ7BuojA9SXB1KniA7xkjoEZsGXvYT2Ckx1vT-ppJV1CycdVPst8Mrir8ycJvBpFvIWQ7UDsvGY2mlO6TjSQW9DAIzvuLnUouuTxewQN-jzslIPbTNU5P5SH08qLvGFvvJ82MyxUG-7a-am41aPUcECDlTUyEp9E4ZEA__",
   scheme: schemeFromBundleId,
   iosBundleId: bundleId,
   androidPackage: bundleId,
