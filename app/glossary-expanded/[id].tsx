@@ -4,6 +4,20 @@ import { ScreenContainer } from '@/components/screen-container';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { glossaryTerms } from '@/lib/glossary-data-expanded';
 
+const categoryColors = {
+  rules: '#FF6B35',
+  equipment: '#004E89',
+  techniques: '#F77F00',
+  tactics: '#06A77D',
+  other: '#D62828',
+};
+
+const difficultyColors = {
+  beginner: '#00D084',
+  intermediate: '#FFB700',
+  advanced: '#FF4757',
+};
+
 export default function GlossaryDetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -21,57 +35,70 @@ export default function GlossaryDetailScreen() {
     );
   }
 
-  const difficultyColor =
-    term.difficulty === 'beginner' ? '#22C55E' : term.difficulty === 'intermediate' ? '#F59E0B' : '#EF4444';
+  const categoryColor = categoryColors[term.category as keyof typeof categoryColors];
+  const difficultyColor = difficultyColors[term.difficulty as keyof typeof difficultyColors];
   const difficultyLabel =
     term.difficulty === 'beginner' ? '初心者向け' : term.difficulty === 'intermediate' ? '中級者向け' : '上級者向け';
 
   return (
-    <ScreenContainer>
-      <ScrollView className="flex-1 p-4">
+    <ScreenContainer className="p-0 flex-1">
+      <ScrollView className="flex-1">
         {/* ヘッダー */}
-        <Pressable onPress={() => router.back()} className="mb-4">
-          <Text className="text-primary font-semibold">← 戻る</Text>
-        </Pressable>
-
-        {/* 用語名 */}
-        <View className="mb-6">
-          <Text className="text-4xl font-bold text-foreground mb-2">{term.name}</Text>
+        <View style={{ backgroundColor: categoryColor }} className="px-4 pt-6 pb-6">
+          <Pressable onPress={() => router.back()} className="mb-4">
+            <Text className="text-white font-semibold text-lg">← 戻る</Text>
+          </Pressable>
+          <Text className="text-4xl font-bold text-white mb-3">{term.name}</Text>
           <View className="flex-row items-center gap-2">
             <View
               style={{ backgroundColor: difficultyColor }}
-              className="px-3 py-1 rounded-full"
+              className="px-4 py-2 rounded-full"
             >
-              <Text className="text-white text-xs font-semibold">{difficultyLabel}</Text>
+              <Text className="text-white text-sm font-bold">{difficultyLabel}</Text>
             </View>
           </View>
         </View>
 
-        {/* 説明文 */}
-        <View className="bg-surface rounded-lg p-4 mb-6">
-          <Text className="text-base text-foreground leading-relaxed">{term.description}</Text>
-        </View>
-
-        {/* 関連用語 */}
-        {term.relatedTerms && term.relatedTerms.length > 0 && (
-          <View className="mb-6">
-            <Text className="text-lg font-bold text-foreground mb-3">関連用語</Text>
-            <View className="gap-2">
-              {term.relatedTerms.map((relatedId) => {
-                const relatedTerm = glossaryTerms.find((t) => t.id === relatedId);
-                return relatedTerm ? (
-                  <Pressable
-                    key={relatedId}
-                    onPress={() => router.push(`/glossary-expanded/${relatedId}`)}
-                    className="bg-surface p-3 rounded-lg"
-                  >
-                    <Text className="text-primary font-semibold">{relatedTerm.name}</Text>
-                  </Pressable>
-                ) : null;
-              })}
-            </View>
+        {/* コンテンツ */}
+        <View className="p-4">
+          {/* 説明文 */}
+          <View className="bg-surface rounded-lg p-4 mb-6 border-l-4" style={{ borderLeftColor: categoryColor }}>
+            <Text className="text-base text-foreground leading-relaxed">{term.description}</Text>
           </View>
-        )}
+
+          {/* 関連用語 */}
+          {term.relatedTerms && term.relatedTerms.length > 0 && (
+            <View className="mb-6">
+              <Text className="text-lg font-bold text-foreground mb-3">関連用語</Text>
+              <View className="gap-2">
+                {term.relatedTerms.map((relatedId) => {
+                  const relatedTerm = glossaryTerms.find((t) => t.id === relatedId);
+                  const relatedColor = categoryColors[relatedTerm?.category as keyof typeof categoryColors];
+                  return relatedTerm ? (
+                    <Pressable
+                      key={relatedId}
+                      onPress={() => router.push(`/glossary-expanded/${relatedId}`)}
+                      style={({ pressed }) => [
+                        {
+                          backgroundColor: pressed ? '#FFF0E6' : '#FFF8F0',
+                          padding: 12,
+                          borderRadius: 8,
+                          borderLeftWidth: 4,
+                          borderLeftColor: relatedColor,
+                        },
+                      ]}
+                    >
+                      <Text style={{ color: relatedColor }} className="font-bold text-base">
+                        {relatedTerm.name}
+                      </Text>
+                      <Text className="text-xs text-muted mt-1">{relatedTerm.description.substring(0, 50)}...</Text>
+                    </Pressable>
+                  ) : null;
+                })}
+              </View>
+            </View>
+          )}
+        </View>
       </ScrollView>
     </ScreenContainer>
   );
