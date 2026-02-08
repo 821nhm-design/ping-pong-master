@@ -43,8 +43,8 @@ export default function GlossaryExpandedScreen() {
         },
       ]}
     >
-      <Text className="text-base font-bold text-foreground mb-2">{item.name}</Text>
-      <Text className="text-sm text-muted leading-relaxed" numberOfLines={2}>
+      <Text style={{ color: '#000000' }} className="text-base font-bold mb-2">{item.name}</Text>
+      <Text style={{ color: '#333333' }} className="text-sm leading-relaxed" numberOfLines={2}>
         {item.description}
       </Text>
       <View className="flex-row items-center mt-3">
@@ -110,7 +110,7 @@ export default function GlossaryExpandedScreen() {
           contentContainerStyle={{ padding: 16, paddingTop: 12 }}
           ListEmptyComponent={
             <View className="items-center justify-center py-8">
-              <Text className="text-muted">用語が見つかりません</Text>
+              <Text style={{ color: '#666666' }}>用語が見つかりません</Text>
             </View>
           }
         />

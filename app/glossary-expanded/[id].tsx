@@ -48,7 +48,7 @@ export default function GlossaryDetailScreen() {
           <Pressable onPress={() => router.back()} className="mb-4">
             <Text className="text-white font-semibold text-lg">← 戻る</Text>
           </Pressable>
-          <Text className="text-4xl font-bold text-white mb-3">{term.name}</Text>
+          <Text style={{ color: '#FFFFFF' }} className="text-4xl font-bold mb-3">{term.name}</Text>
           <View className="flex-row items-center gap-2">
             <View
               style={{ backgroundColor: difficultyColor }}
@@ -63,13 +63,13 @@ export default function GlossaryDetailScreen() {
         <View className="p-4">
           {/* 説明文 */}
           <View className="bg-surface rounded-lg p-4 mb-6 border-l-4" style={{ borderLeftColor: categoryColor }}>
-            <Text className="text-base text-foreground leading-relaxed">{term.description}</Text>
+            <Text style={{ color: '#000000' }} className="text-base leading-relaxed">{term.description}</Text>
           </View>
 
           {/* 関連用語 */}
           {term.relatedTerms && term.relatedTerms.length > 0 && (
             <View className="mb-6">
-              <Text className="text-lg font-bold text-foreground mb-3">関連用語</Text>
+              <Text style={{ color: '#000000' }} className="text-lg font-bold mb-3">関連用語</Text>
               <View className="gap-2">
                 {term.relatedTerms.map((relatedId) => {
                   const relatedTerm = glossaryTerms.find((t) => t.id === relatedId);
@@ -88,10 +88,10 @@ export default function GlossaryDetailScreen() {
                         },
                       ]}
                     >
-                      <Text style={{ color: relatedColor }} className="font-bold text-base">
+                      <Text style={{ color: '#000000' }} className="font-bold text-base">
                         {relatedTerm.name}
                       </Text>
-                      <Text className="text-xs text-muted mt-1">{relatedTerm.description.substring(0, 50)}...</Text>
+                      <Text style={{ color: '#333333' }} className="text-xs mt-1">{relatedTerm.description.substring(0, 50)}...</Text>
                     </Pressable>
                   ) : null;
                 })}
