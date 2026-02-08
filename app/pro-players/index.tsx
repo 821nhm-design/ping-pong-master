@@ -3,6 +3,7 @@ import { ScrollView, Text, View, Pressable, FlatList } from 'react-native';
 import { ScreenContainer } from '@/components/screen-container';
 import { useRouter } from 'expo-router';
 import { proPlayersMega } from '@/lib/pro-players-mega';
+import { womenProPlayersMega } from '@/lib/pro-players-women-mega';
 
 const rankingColors = {
   1: '#FFD700',
@@ -12,13 +13,16 @@ const rankingColors = {
 
 export default function ProPlayersScreen() {
   const router = useRouter();
+  const [activeGender, setActiveGender] = useState<'male' | 'female'>('male');
   const [activeCategory, setActiveCategory] = useState<string>('top10');
 
+  const allPlayers = activeGender === 'female' ? womenProPlayersMega : proPlayersMega;
+
   const filteredPlayers = activeCategory === 'top10' 
-    ? proPlayersMega.slice(0, 10).sort((a, b) => a.rank - b.rank)
+    ? allPlayers.slice(0, 10).sort((a, b) => a.rank - b.rank)
     : activeCategory === 'top50'
-    ? proPlayersMega.slice(0, 50).sort((a, b) => a.rank - b.rank)
-    : proPlayersMega.sort((a, b) => a.rank - b.rank);
+    ? allPlayers.slice(0, 50).sort((a, b) => a.rank - b.rank)
+    : allPlayers.sort((a, b) => a.rank - b.rank);
 
   const getRankingColor = (ranking: number) => {
     if (ranking === 1) return rankingColors[1];
@@ -27,9 +31,9 @@ export default function ProPlayersScreen() {
     return '#FF6B35';
   };
 
-  const renderPlayerItem = ({ item }: { item: typeof proPlayersMega[0] }) => (
+  const renderPlayerItem = ({ item }: { item: any }) => (
     <Pressable
-      onPress={() => router.push(`/pro-players/${item.id}`)}
+      onPress={() => router.push(`/pro-players/${item.id}?gender=${activeGender}`)}
       style={({ pressed }) => [
         {
           backgroundColor: pressed ? '#FFE8D6' : '#FFFFFF',
@@ -65,8 +69,8 @@ export default function ProPlayersScreen() {
           </View>
         </View>
       </View>
-      <View className="flex-row gap-2 flex-wrap">
-        {item.specialties.slice(0, 3).map((specialty, idx) => (
+      <View className="flex-row gap-2 flex-wrap mb-2">
+        {item.specialties.slice(0, 3).map((specialty: any, idx: number) => (
           <View key={idx} className="bg-blue-100 px-2 py-1 rounded">
             <Text style={{ color: '#004E89' }} className="text-xs font-semibold">
               {specialty}
@@ -81,6 +85,11 @@ export default function ProPlayersScreen() {
           </View>
         )}
       </View>
+      {item.description && (
+        <Text style={{ color: '#666666' }} className="text-xs leading-relaxed">
+          {item.description.substring(0, 100)}...
+        </Text>
+      )}
     </Pressable>
   );
 
@@ -93,8 +102,42 @@ export default function ProPlayersScreen() {
           <Text className="text-white text-sm mt-1 opacity-90">世界トップ100選手の戦術を学ぼう</Text>
         </View>
 
-        {/* カテゴリタブ */}
-        <View className="bg-background px-4 pt-3 pb-2">
+        {/* 男女別タブ */}
+        <View className="bg-background px-4 pt-3 pb-2 flex-row gap-2">
+          {[
+            { id: 'male', name: '男子' },
+            { id: 'female', name: '女子' },
+          ].map((gender) => {
+            const isActive = activeGender === gender.id;
+            return (
+              <Pressable
+                key={gender.id}
+                onPress={() => {
+                  setActiveGender(gender.id as 'male' | 'female');
+                  setActiveCategory('top10');
+                }}
+                style={({ pressed }) => [
+                  {
+                    paddingHorizontal: 16,
+                    paddingVertical: 10,
+                    borderRadius: 20,
+                    backgroundColor: isActive ? '#FF6B35' : '#F0F0F0',
+                    opacity: pressed ? 0.8 : 1,
+                  },
+                ]}
+              >
+                <Text
+                  className={isActive ? 'text-white font-bold text-sm' : 'text-foreground font-semibold text-sm'}
+                >
+                  {gender.name}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+
+        {/* ランキングカテゴリタブ */}
+        <View className="bg-background px-4 pt-2 pb-2">
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View className="flex-row gap-2">
               {[
