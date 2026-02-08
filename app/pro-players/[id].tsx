@@ -3,12 +3,14 @@ import { ScrollView, Text, View, Pressable } from 'react-native';
 import { ScreenContainer } from '@/components/screen-container';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { proPlayersMega } from '@/lib/pro-players-mega';
+import { womenProPlayersMega } from '@/lib/pro-players-women-mega';
 
 export default function ProPlayerDetailScreen() {
   const router = useRouter();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, gender } = useLocalSearchParams<{ id: string; gender?: string }>();
 
-  const player = proPlayersMega.find((p) => p.id === id);
+  const allPlayers = gender === 'female' ? womenProPlayersMega : proPlayersMega;
+  const player = allPlayers.find((p) => p.id === id);
 
   if (!player) {
     return (
@@ -94,23 +96,30 @@ export default function ProPlayerDetailScreen() {
           <View className="gap-3">
             {player.specialties.map((specialty, idx) => (
               <View key={idx} className="bg-blue-100 rounded-lg p-4">
-                <Text style={{ color: '#004E89' }} className="text-lg font-bold">
+                <Text style={{ color: '#004E89' }} className="text-lg font-bold mb-2">
                   {idx + 1}. {specialty}
                 </Text>
+                {('specialtiesDetail' in player) && player.specialtiesDetail && player.specialtiesDetail[idx] && (
+                  <Text style={{ color: '#333333' }} className="text-sm leading-relaxed">
+                    {player.specialtiesDetail[idx]}
+                  </Text>
+                )}
               </View>
             ))}
           </View>
         </View>
 
         {/* 説明 */}
-        <View className="px-4 py-6">
-          <Text style={{ color: '#000000' }} className="text-2xl font-bold mb-4">
-            プロフィール
-          </Text>
-          <Text style={{ color: '#333333' }} className="text-base leading-relaxed">
-            {player.description}
-          </Text>
-        </View>
+        {player.description && (
+          <View className="px-4 py-6">
+            <Text style={{ color: '#000000' }} className="text-2xl font-bold mb-4">
+              プロフィール
+            </Text>
+            <Text style={{ color: '#333333' }} className="text-base leading-relaxed">
+              {player.description}
+            </Text>
+          </View>
+        )}
 
         {/* 戻るボタン */}
         <View className="px-4 py-6">
