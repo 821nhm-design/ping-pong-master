@@ -45,6 +45,32 @@ export default function HomeScreen() {
             ))}
           </View>
 
+          {/* Additional Resources */}
+          <View className="gap-3 mt-2">
+            <TouchableOpacity
+              onPress={() => router.push("/glossary")}
+              className="bg-surface rounded-2xl p-4 border border-border active:opacity-80"
+              style={{ backgroundColor: "#E8F4F8" }}
+            >
+              <View className="flex-row items-center justify-between">
+                <Text className="text-lg font-semibold text-foreground flex-1">用語辞典</Text>
+                <Text className="text-sm text-muted">→</Text>
+              </View>
+              <Text className="text-xs text-muted mt-1">卓球用語を詳しく学ぶ</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => router.push("/core-training")}
+              className="bg-surface rounded-2xl p-4 border border-border active:opacity-80"
+              style={{ backgroundColor: "#F0E8F8" }}
+            >
+              <View className="flex-row items-center justify-between">
+                <Text className="text-lg font-semibold text-foreground flex-1">体幹トレーニング</Text>
+                <Text className="text-sm text-muted">→</Text>
+              </View>
+              <Text className="text-xs text-muted mt-1">体を鍛える</Text>
+            </TouchableOpacity>
+          </View>
+
           {/* Info Section */}
           <View className="bg-surface rounded-2xl p-4 border border-border mt-4">
             <Text className="text-sm font-semibold text-foreground mb-2">このアプリについて</Text>
