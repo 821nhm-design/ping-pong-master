@@ -8,6 +8,7 @@ const resourceColors = [
   { bg: "#FFE8D6", border: "#FF6B35", icon: "📚" },
   { bg: "#D4F1F4", border: "#004E89", icon: "💪" },
   { bg: "#FFF4E6", border: "#F77F00", icon: "🎯" },
+  { bg: "#FFE8D6", border: "#FF6B35", icon: "🌟" },
 ];
 
 export default function HomeScreen() {
@@ -94,7 +95,7 @@ export default function HomeScreen() {
             <TouchableOpacity
               onPress={() => router.push("/training")}
               style={{ backgroundColor: resourceColors[2].bg, borderLeftColor: resourceColors[2].border }}
-              className="rounded-xl p-4 border-l-4 active:opacity-75"
+              className="rounded-xl p-4 border-l-4 mb-3 active:opacity-75"
             >
               <View className="flex-row items-center justify-between mb-2">
                 <Text className="text-2xl">{resourceColors[2].icon}</Text>
@@ -102,6 +103,20 @@ export default function HomeScreen() {
               </View>
               <Text className="text-lg font-bold text-foreground mb-1">練習メニュー</Text>
               <Text className="text-sm text-muted">レベル別の練習方法を学ぶ</Text>
+            </TouchableOpacity>
+
+            {/* プロ選手 */}
+            <TouchableOpacity
+              onPress={() => router.push("/pro-players")}
+              style={{ backgroundColor: resourceColors[3].bg, borderLeftColor: resourceColors[3].border }}
+              className="rounded-xl p-4 border-l-4 active:opacity-75"
+            >
+              <View className="flex-row items-center justify-between mb-2">
+                <Text className="text-2xl">{resourceColors[3].icon}</Text>
+                <Text className="text-sm text-foreground">→</Text>
+              </View>
+              <Text className="text-lg font-bold text-foreground mb-1">プロ選手</Text>
+              <Text className="text-sm text-muted">世界トップ選手の戦術を学ぶ</Text>
             </TouchableOpacity>
           </View>
 
