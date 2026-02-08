@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, Text, View, Pressable, FlatList } from 'react-native';
+import { ScrollView, Text, View, Pressable, FlatList, Dimensions } from 'react-native';
 import { ScreenContainer } from '@/components/screen-container';
 import { useRouter } from 'expo-router';
 import { glossaryTerms, glossaryCategories } from '@/lib/glossary-data-expanded';
@@ -35,46 +35,50 @@ export default function GlossaryExpandedScreen() {
   );
 
   return (
-    <ScreenContainer className="p-4">
-      {/* カテゴリタブ */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4">
-        <View className="flex-row gap-2">
-          {glossaryCategories.map((category) => (
-            <Pressable
-              key={category.id}
-              onPress={() => setActiveCategory(category.id as any)}
-              style={({ pressed }) => [
-                {
-                  paddingHorizontal: 12,
-                  paddingVertical: 8,
-                  borderRadius: 20,
-                  backgroundColor: activeCategory === category.id ? '#0a7ea4' : '#e5e7eb',
-                  opacity: pressed ? 0.8 : 1,
-                },
-              ]}
-            >
-              <Text
-                className={activeCategory === category.id ? 'text-white font-semibold text-sm' : 'text-foreground font-semibold text-sm'}
-              >
-                {category.name}
-              </Text>
-            </Pressable>
-          ))}
+    <ScreenContainer className="p-0 flex-1">
+      <View className="flex-1">
+        {/* カテゴリタブ */}
+        <View className="bg-background px-4 pt-4 pb-2">
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-2">
+            <View className="flex-row gap-2">
+              {glossaryCategories.map((category) => (
+                <Pressable
+                  key={category.id}
+                  onPress={() => setActiveCategory(category.id as any)}
+                  style={({ pressed }) => [
+                    {
+                      paddingHorizontal: 12,
+                      paddingVertical: 8,
+                      borderRadius: 20,
+                      backgroundColor: activeCategory === category.id ? '#0a7ea4' : '#e5e7eb',
+                      opacity: pressed ? 0.8 : 1,
+                    },
+                  ]}
+                >
+                  <Text
+                    className={activeCategory === category.id ? 'text-white font-semibold text-sm' : 'text-foreground font-semibold text-sm'}
+                  >
+                    {category.name}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          </ScrollView>
         </View>
-      </ScrollView>
 
-      {/* 用語リスト */}
-      <FlatList
-        data={categoryTerms}
-        renderItem={renderTermItem}
-        keyExtractor={(item) => item.id}
-        scrollEnabled={false}
-        ListEmptyComponent={
-          <View className="items-center justify-center py-8">
-            <Text className="text-muted">用語が見つかりません</Text>
-          </View>
-        }
-      />
+        {/* 用語リスト */}
+        <FlatList
+          data={categoryTerms}
+          renderItem={renderTermItem}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ padding: 16, paddingTop: 8 }}
+          ListEmptyComponent={
+            <View className="items-center justify-center py-8">
+              <Text className="text-muted">用語が見つかりません</Text>
+            </View>
+          }
+        />
+      </View>
     </ScreenContainer>
   );
 }
