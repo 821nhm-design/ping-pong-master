@@ -3,13 +3,13 @@ import { ScrollView, Text, View, Pressable } from 'react-native';
 import { ScreenContainer } from '@/components/screen-container';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { proPlayersMega } from '@/lib/pro-players-mega';
-import { womenProPlayersMega } from '@/lib/pro-players-women-mega';
+import { womenProPlayersAll } from '@/lib/pro-players-women-complete';
 
 export default function ProPlayerDetailScreen() {
   const router = useRouter();
   const { id, gender } = useLocalSearchParams<{ id: string; gender?: string }>();
 
-  const allPlayers = gender === 'female' ? womenProPlayersMega : proPlayersMega;
+  const allPlayers = gender === 'female' ? womenProPlayersAll : proPlayersMega;
   const player = allPlayers.find((p) => p.id === id);
 
   if (!player) {
