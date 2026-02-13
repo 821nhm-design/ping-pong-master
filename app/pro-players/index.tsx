@@ -3,7 +3,7 @@ import { ScrollView, Text, View, Pressable, FlatList } from 'react-native';
 import { ScreenContainer } from '@/components/screen-container';
 import { useRouter } from 'expo-router';
 import { proPlayersMega } from '@/lib/pro-players-mega';
-import { womenProPlayersAll } from '@/lib/pro-players-women-complete';
+import { womenProPlayersMega } from '@/lib/pro-players-women-mega';
 
 const rankingColors = {
   1: '#FFD700',
@@ -16,7 +16,7 @@ export default function ProPlayersScreen() {
   const [activeGender, setActiveGender] = useState<'male' | 'female'>('male');
   const [activeCategory, setActiveCategory] = useState<string>('top10');
 
-  const allPlayers = activeGender === 'female' ? womenProPlayersAll : proPlayersMega;
+  const allPlayers = activeGender === 'female' ? womenProPlayersMega : proPlayersMega;
 
   const filteredPlayers = activeCategory === 'top10' 
     ? allPlayers.slice(0, 10).sort((a, b) => a.rank - b.rank)

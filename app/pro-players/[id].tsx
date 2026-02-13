@@ -3,14 +3,14 @@ import { ScrollView, Text, View, Pressable } from 'react-native';
 import { ScreenContainer } from '@/components/screen-container';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { proPlayersMega } from '@/lib/pro-players-mega';
-import { womenProPlayersAll } from '@/lib/pro-players-women-complete';
+import { womenProPlayersMega } from '@/lib/pro-players-women-mega';
 
 export default function ProPlayerDetailScreen() {
   const router = useRouter();
   const { id, gender } = useLocalSearchParams<{ id: string; gender?: string }>();
 
-  const allPlayers = gender === 'female' ? womenProPlayersAll : proPlayersMega;
-  const player = allPlayers.find((p) => p.id === id);
+  const allPlayers = gender === 'female' ? womenProPlayersMega : proPlayersMega;
+  const player = allPlayers.find((p: any) => p.id === id);
 
   if (!player) {
     return (
@@ -94,7 +94,7 @@ export default function ProPlayerDetailScreen() {
             得意な戦術
           </Text>
           <View className="gap-3">
-            {player.specialties.map((specialty, idx) => (
+            {player.specialties.map((specialty: string, idx: number) => (
               <View key={idx} className="bg-blue-100 rounded-lg p-4">
                 <Text style={{ color: '#004E89' }} className="text-lg font-bold mb-2">
                   {idx + 1}. {specialty}
