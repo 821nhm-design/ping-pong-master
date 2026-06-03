@@ -168,10 +168,10 @@ const womenProPlayersMega = [
     description: '日本の有力選手。フォアドライブの威力が高く、アジア大会での成績も安定している。',
   },
   {
-    id: 'miwa-harimoto',
+    id: 'tomokazu-harimoto',
     rank: 8,
-    name: '張本美和',
-    nameEnglish: 'Miwa Harimoto',
+    name: 'トモカズ・ハリモト',
+    nameEnglish: 'Tomokazu Harimoto',
     country: '日本',
     playingStyle: 'シェークハンド（右利き）',
     specialties: [
@@ -188,8 +188,8 @@ const womenProPlayersMega = [
       'ショートサーブからの3球目攻撃：短いサーブを出した後、相手のレシーブが浅い場合、素早く前に出て3球目を強く攻撃します。',
       'ゲーム運びの上手さ：試合の流れを読み、適切なタイミングで攻撃と守備を切り替えます。戦術的な判断が優れています。',
     ],
-    points: 4230,
-    description: '日本の有力選手。フォアドライブの威力が高く、国際大会での成績も安定している。張本兄妹の妹。',
+    points: 4750,
+    description: '日本の有力選手。フォアドライブの威力が高く、国際大会での成績も安定している。',
   },
   {
     id: 'mima-ito',
