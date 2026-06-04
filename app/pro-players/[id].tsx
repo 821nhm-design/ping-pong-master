@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, Text, View, Pressable } from 'react-native';
+import { ScrollView, Text, View, Pressable, TouchableOpacity } from 'react-native';
 import { ScreenContainer } from '@/components/screen-container';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { proPlayersMega } from '@/lib/pro-players-mega';
@@ -38,16 +38,11 @@ export default function ProPlayerDetailScreen() {
       <ScrollView className="flex-1">
         {/* ヘッダー */}
         <View style={{ backgroundColor: getRankingColor(player.rank) }} className="px-4 pt-6 pb-6">
-          <View className="flex-row items-center justify-between mb-4">
-            <Text style={{ color: player.rank === 1 ? '#000000' : '#FFFFFF' }} className="text-4xl font-bold">
-              #{player.rank}
+          <TouchableOpacity onPress={() => router.back()} className="mb-4">
+            <Text style={{ color: player.rank === 1 ? '#000000' : '#FFFFFF' }} className="text-lg font-semibold">
+              ← 戻る
             </Text>
-            <Pressable onPress={() => router.back()} className="p-2">
-              <Text style={{ color: player.rank === 1 ? '#000000' : '#FFFFFF' }} className="text-2xl">
-                ✕
-              </Text>
-            </Pressable>
-          </View>
+          </TouchableOpacity>
           <Text style={{ color: player.rank === 1 ? '#000000' : '#FFFFFF' }} className="text-3xl font-bold mb-2">
             {player.name}
           </Text>
@@ -121,22 +116,8 @@ export default function ProPlayerDetailScreen() {
           </View>
         )}
 
-        {/* 戻るボタン */}
-        <View className="px-4 py-6">
-          <Pressable
-            onPress={() => router.back()}
-            style={({ pressed }) => [
-              {
-                backgroundColor: pressed ? '#E55100' : '#FF6B35',
-                paddingVertical: 14,
-                paddingHorizontal: 20,
-                borderRadius: 8,
-              },
-            ]}
-          >
-            <Text className="text-white text-center font-bold text-lg">戻る</Text>
-          </Pressable>
-        </View>
+        {/* 下部のパディング */}
+        <View className="px-4 py-6" />
       </ScrollView>
     </ScreenContainer>
   );
