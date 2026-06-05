@@ -28,8 +28,8 @@ export default function LoginScreen() {
   };
 
   const handleRegister = () => {
-    // 登録画面へ遷移（後で実装）
-    alert('登録画面はまだ実装されていません');
+    // 登録画面へ遷移
+    router.navigate({ pathname: '/auth/register' } as any);
   };
 
   return (
