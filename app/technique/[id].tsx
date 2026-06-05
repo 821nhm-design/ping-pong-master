@@ -1,14 +1,37 @@
 import { ScrollView, Text, View, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ScreenContainer } from "@/components/screen-container";
 import { getTechniqueById } from "@/lib/techniques-data";
+import { addFavorite, removeFavorite, isFavorite } from "@/lib/favorites-utils";
 
 export default function TechniqueDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"overview" | "steps" | "players">("overview");
+  const [isFav, setIsFav] = useState(false);
   const technique = id ? getTechniqueById(id) : null;
+
+  // お気に入り状態を確認
+  useEffect(() => {
+    if (technique?.id) {
+      isFavorite(technique.id, 'technique').then(setIsFav);
+    }
+  }, [technique?.id]);
+
+  const handleToggleFavorite = async () => {
+    if (!technique) return;
+    if (isFav) {
+      await removeFavorite(technique.id, 'technique');
+    } else {
+      await addFavorite({
+        id: technique.id,
+        type: 'technique',
+        title: technique.name,
+      });
+    }
+    setIsFav(!isFav);
+  };
 
   if (!technique) {
     return (
@@ -27,7 +50,9 @@ export default function TechniqueDetailScreen() {
             <Text className="text-lg text-primary">戻る</Text>
           </TouchableOpacity>
           <Text className="text-2xl font-bold text-foreground flex-1 text-center">{technique.name}</Text>
-          <View className="w-10" />
+          <TouchableOpacity onPress={handleToggleFavorite} className="p-2">
+            <Text className="text-2xl">{isFav ? '❤️' : '🤍'}</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Quick Info */}

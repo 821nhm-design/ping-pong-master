@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScrollView, Text, View, Pressable } from 'react-native';
 import { ScreenContainer } from '@/components/screen-container';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { glossaryTerms } from '@/lib/glossary-data-expanded';
+import { addFavorite, removeFavorite, isFavorite } from '@/lib/favorites-utils';
 
 const categoryColors = {
   rules: '#FF6B35',
@@ -21,8 +22,30 @@ const difficultyColors = {
 export default function GlossaryDetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const [isFav, setIsFav] = useState(false);
 
   const term = glossaryTerms.find((t) => t.id === id);
+
+  // お気に入り状態を確認
+  useEffect(() => {
+    if (term?.id) {
+      isFavorite(term.id, 'glossary').then(setIsFav);
+    }
+  }, [term?.id]);
+
+  const handleToggleFavorite = async () => {
+    if (!term) return;
+    if (isFav) {
+      await removeFavorite(term.id, 'glossary');
+    } else {
+      await addFavorite({
+        id: term.id,
+        type: 'glossary',
+        title: term.name,
+      });
+    }
+    setIsFav(!isFav);
+  };
 
   if (!term) {
     return (
@@ -45,9 +68,14 @@ export default function GlossaryDetailScreen() {
       <ScrollView className="flex-1">
         {/* ヘッダー */}
         <View style={{ backgroundColor: categoryColor }} className="px-4 pt-6 pb-6">
-          <Pressable onPress={() => router.back()} className="mb-4">
-            <Text className="text-white font-semibold text-lg">← 戻る</Text>
-          </Pressable>
+          <View className="flex-row items-center justify-between mb-4">
+            <Pressable onPress={() => router.back()}>
+              <Text className="text-white font-semibold text-lg">← 戻る</Text>
+            </Pressable>
+            <Pressable onPress={handleToggleFavorite} style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}>
+              <Text className="text-2xl">{isFav ? '❤️' : '🤍'}</Text>
+            </Pressable>
+          </View>
           <Text style={{ color: '#FFFFFF' }} className="text-4xl font-bold mb-3">{term.name}</Text>
           <View className="flex-row items-center gap-2">
             <View

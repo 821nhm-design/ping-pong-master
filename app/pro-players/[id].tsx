@@ -4,13 +4,38 @@ import { ScreenContainer } from '@/components/screen-container';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { proPlayersMega } from '@/lib/pro-players-mega';
 import { womenProPlayersMega } from '@/lib/pro-players-women-mega';
+import { useState, useEffect } from 'react';
+import { addFavorite, removeFavorite, isFavorite } from '@/lib/favorites-utils';
 
 export default function ProPlayerDetailScreen() {
   const router = useRouter();
   const { id, gender } = useLocalSearchParams<{ id: string; gender?: string }>();
+  const [isFav, setIsFav] = useState(false);
 
   const allPlayers = gender === 'female' ? womenProPlayersMega : proPlayersMega;
   const player = allPlayers.find((p: any) => p.id === id);
+
+  // お気に入り状態を確認
+  useEffect(() => {
+    if (player?.id) {
+      isFavorite(player.id, 'player').then(setIsFav);
+    }
+  }, [player?.id]);
+
+  const handleToggleFavorite = async () => {
+    if (!player) return;
+    if (isFav) {
+      await removeFavorite(player.id, 'player');
+    } else {
+      await addFavorite({
+        id: player.id,
+        type: 'player',
+        title: player.name,
+        gender: gender as 'male' | 'female',
+      });
+    }
+    setIsFav(!isFav);
+  };
 
   if (!player) {
     return (
@@ -38,11 +63,16 @@ export default function ProPlayerDetailScreen() {
       <ScrollView className="flex-1">
         {/* ヘッダー */}
         <View style={{ backgroundColor: getRankingColor(player.rank) }} className="px-4 pt-6 pb-6">
-          <TouchableOpacity onPress={() => router.back()} className="mb-4">
-            <Text style={{ color: player.rank === 1 ? '#000000' : '#FFFFFF' }} className="text-lg font-semibold">
-              ← 戻る
-            </Text>
-          </TouchableOpacity>
+          <View className="flex-row items-center justify-between mb-4">
+            <TouchableOpacity onPress={() => router.back()}>
+              <Text style={{ color: player.rank === 1 ? '#000000' : '#FFFFFF' }} className="text-lg font-semibold">
+                ← 戻る
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleToggleFavorite}>
+              <Text className="text-2xl">{isFav ? '❤️' : '🤍'}</Text>
+            </TouchableOpacity>
+          </View>
           <Text style={{ color: player.rank === 1 ? '#000000' : '#FFFFFF' }} className="text-3xl font-bold mb-2">
             {player.name}
           </Text>
