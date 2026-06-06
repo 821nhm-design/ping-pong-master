@@ -1,19 +1,34 @@
 import { FlatList, Text, View, TouchableOpacity, TextInput } from "react-native";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ScreenContainer } from "@/components/screen-container";
 import { GLOSSARY_CATEGORIES, GLOSSARY_TERMS, searchTerms } from "@/lib/glossary-data";
+import { isPremiumUser, FREE_TIER_LIMITS } from "@/lib/premium-utils";
 
 export default function GlossaryScreen() {
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isPremium, setIsPremium] = useState(false);
 
-  const displayTerms = searchQuery
+  useEffect(() => {
+    checkPremiumStatus();
+  }, []);
+
+  const checkPremiumStatus = async () => {
+    const premium = await isPremiumUser();
+    setIsPremium(premium);
+  };
+
+  let displayTerms = searchQuery
     ? searchTerms(searchQuery)
     : selectedCategory
       ? GLOSSARY_TERMS.filter((t) => t.category === selectedCategory)
       : GLOSSARY_TERMS;
+
+  // 無料版の場合は最初の30個のみ表示
+  const lockedCount = !isPremium ? Math.max(0, displayTerms.length - FREE_TIER_LIMITS.glossary) : 0;
+  displayTerms = isPremium ? displayTerms : displayTerms.slice(0, FREE_TIER_LIMITS.glossary);
 
   const handleTermPress = (termId: string) => {
     router.push({
@@ -88,6 +103,23 @@ export default function GlossaryScreen() {
             </View>
           </TouchableOpacity>
         )}
+        ListFooterComponent={
+          lockedCount > 0 ? (
+            <View className="p-4 bg-surface rounded-lg border border-border mt-4">
+              <Text className="text-foreground font-semibold mb-3">
+                🔒 {lockedCount}個の用語がロック中
+              </Text>
+              <TouchableOpacity
+                onPress={() => router.push('/premium')}
+                className="bg-primary px-4 py-2 rounded-full"
+              >
+                <Text className="text-white font-semibold text-center">
+                  プレミアムで全て見る
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : null
+        }
         contentContainerStyle={{ paddingBottom: 20 }}
       />
     </ScreenContainer>

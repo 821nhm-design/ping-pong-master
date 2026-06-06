@@ -1,8 +1,9 @@
 import { ScrollView, Text, View, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
-
+import { useState, useEffect } from "react";
 import { ScreenContainer } from "@/components/screen-container";
 import { CATEGORIES } from "@/lib/techniques-data";
+import { isPremiumUser } from "@/lib/premium-utils";
 
 const resourceColors = [
   { bg: "#FFE8D6", border: "#FF6B35", icon: "📚" },
@@ -13,6 +14,16 @@ const resourceColors = [
 
 export default function HomeScreen() {
   const router = useRouter();
+  const [isPremium, setIsPremium] = useState(false);
+
+  useEffect(() => {
+    checkPremiumStatus();
+  }, []);
+
+  const checkPremiumStatus = async () => {
+    const premium = await isPremiumUser();
+    setIsPremium(premium);
+  };
 
   const handleCategoryPress = (categoryId: string) => {
     router.push({
@@ -119,6 +130,25 @@ export default function HomeScreen() {
               <Text className="text-sm text-muted">世界トップ選手の戦術を学ぶ</Text>
             </TouchableOpacity>
           </View>
+
+          {/* プレミアムバナー */}
+          {!isPremium && (
+            <View className="bg-gradient-to-r from-orange-100 to-orange-50 rounded-xl p-4 border border-orange-300 mt-4">
+              <Text className="text-base font-bold text-foreground mb-2">🎁 プレミアムを試す</Text>
+              <Text className="text-sm text-foreground leading-relaxed mb-3">
+                7日間無料で、すべてのコンテンツにアクセスできます。
+              </Text>
+              <TouchableOpacity
+                onPress={() => router.push('/premium')}
+                style={{ backgroundColor: '#FF6B35' }}
+                className="rounded-lg py-2 px-4"
+              >
+                <Text className="text-white font-bold text-center">
+                  7日間無料トライアルを開始
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
           {/* 情報セクション */}
           <View className="bg-gradient-to-r from-blue-100 to-blue-50 rounded-xl p-4 border border-blue-200 mt-4">

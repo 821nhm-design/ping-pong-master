@@ -3,14 +3,14 @@ import { ScrollView, Text, View, Pressable, ActivityIndicator } from 'react-nati
 import { ScreenContainer } from '@/components/screen-container';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { getCurrentUser, logout } from '@/lib/auth-utils';
-import { isPremiumUser, getRemainingDays, getNextBillingDate } from '@/lib/premium-utils';
+import { isPremiumUser, getPurchase, getFreeTrialRemainingDays } from '@/lib/premium-utils';
 
 export default function ProfileScreen() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [isPremium, setIsPremium] = useState(false);
-  const [remainingDays, setRemainingDays] = useState(0);
-  const [nextBillingDate, setNextBillingDate] = useState<Date | null>(null);
+  const [purchaseDate, setPurchaseDate] = useState<Date | null>(null);
+  const [trialRemainingDays, setTrialRemainingDays] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -31,11 +31,14 @@ export default function ProfileScreen() {
         setIsPremium(premium);
 
         if (premium) {
-          const days = await getRemainingDays();
-          setRemainingDays(days);
-
-          const billingDate = await getNextBillingDate();
-          setNextBillingDate(billingDate);
+          const purchase = await getPurchase();
+          if (purchase) {
+            setPurchaseDate(new Date(purchase.purchaseDate));
+          } else {
+            // 無料トライアル中の場合
+            const days = await getFreeTrialRemainingDays();
+            setTrialRemainingDays(days);
+          }
         }
       }
     } catch (error) {
@@ -161,38 +164,28 @@ export default function ProfileScreen() {
 
           {isPremium ? (
             <>
-              <View className="bg-success bg-opacity-10 border border-success rounded-lg p-6 mb-6">
-                <Text className="text-success font-bold text-lg mb-2">
-                  ✓ プレミアム会員
-                </Text>
-                <Text className="text-success text-sm mb-4">
-                  残り {remainingDays} 日間のアクセス権があります
-                </Text>
-                {nextBillingDate && (
-                  <Text className="text-success text-xs">
-                    次回更新日: {nextBillingDate.toLocaleDateString('ja-JP')}
+              {purchaseDate ? (
+                <View className="bg-success bg-opacity-10 border border-success rounded-lg p-6 mb-6">
+                  <Text className="text-success font-bold text-lg mb-2">
+                    ✓ Ping Pong Master Pro
                   </Text>
-                )}
-              </View>
-
-              <Pressable
-                onPress={handleManageSubscription}
-                style={({ pressed }) => [
-                  {
-                    backgroundColor: '#FFFFFF',
-                    borderWidth: 2,
-                    borderColor: '#FF6B35',
-                    paddingVertical: 12,
-                    borderRadius: 8,
-                    marginBottom: 12,
-                    opacity: pressed ? 0.8 : 1,
-                  },
-                ]}
-              >
-                <Text className="text-primary text-center font-bold">
-                  サブスクリプションを管理
-                </Text>
-              </Pressable>
+                  <Text className="text-success text-sm mb-2">
+                    永久アクセス（買い切り型）
+                  </Text>
+                  <Text className="text-success text-xs">
+                    購入日: {purchaseDate.toLocaleDateString('ja-JP')}
+                  </Text>
+                </View>
+              ) : (
+                <View className="bg-warning bg-opacity-10 border border-warning rounded-lg p-6 mb-6">
+                  <Text className="text-warning font-bold text-lg mb-2">
+                    🎁 7日間無料トライアル中
+                  </Text>
+                  <Text className="text-warning text-sm">
+                    残り {trialRemainingDays} 日間
+                  </Text>
+                </View>
+              )}
             </>
           ) : (
             <>

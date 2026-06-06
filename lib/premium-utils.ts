@@ -5,18 +5,16 @@ export type PremiumPlan = {
   name: string;
   price: number;
   currency: string;
-  billingPeriod: 'monthly' | 'yearly';
+  billingPeriod: 'onetime';
   features: string[];
   description: string;
 };
 
-export type PremiumSubscription = {
+export type PremiumPurchase = {
   userId: string;
-  planId: string;
-  status: 'active' | 'canceled' | 'expired';
-  startDate: number;
-  endDate: number;
-  autoRenew: boolean;
+  purchaseDate: number;
+  expiryDate: number | null; // 買い切り型なので null（永久アクセス）
+  status: 'active' | 'expired';
 };
 
 export type PremiumFeature = {
@@ -27,142 +25,231 @@ export type PremiumFeature = {
   requiresPremium: boolean;
 };
 
-const SUBSCRIPTION_KEY = 'ping_pong_subscription';
+const PURCHASE_KEY = 'ping_pong_purchase';
+const TRIAL_KEY = 'ping_pong_trial';
 const PREMIUM_FEATURES_KEY = 'ping_pong_premium_features';
 
-// プレミアムプラン定義
-export const PREMIUM_PLANS: PremiumPlan[] = [
-  {
-    id: 'monthly',
-    name: '月間プラン',
-    price: 980,
-    currency: 'JPY',
-    billingPeriod: 'monthly',
-    features: [
-      '高度な戦術分析',
-      'プロ選手の詳細動画解説',
-      'ビデオレッスン（月10本まで）',
-      '練習計画の自動生成',
-      '優先サポート',
-    ],
-    description: '月ごとにキャンセル可能。いつでも解約できます。',
-  },
-  {
-    id: 'yearly',
-    name: '年間プラン',
-    price: 9800,
-    currency: 'JPY',
-    billingPeriod: 'yearly',
-    features: [
-      '高度な戦術分析',
-      'プロ選手の詳細動画解説',
-      'ビデオレッスン（無制限）',
-      '練習計画の自動生成',
-      '優先サポート',
-      '年間20%割引',
-    ],
-    description: '年間契約で20%お得。1年間のアクセス権を取得します。',
-  },
-];
+// 買い切り型プレミアムプラン定義
+export const PREMIUM_PLAN: PremiumPlan = {
+  id: 'pro',
+  name: 'Ping Pong Master Pro',
+  price: 3580,
+  currency: 'JPY',
+  billingPeriod: 'onetime',
+  features: [
+    'すべてのコンテンツに無制限アクセス',
+    'AI戦術分析機能',
+    'プロ選手の全100名の情報',
+    '動画解説',
+    '練習記録管理',
+    '永久アクセス（追加料金なし）',
+  ],
+  description: '一度の購入ですべてのコンテンツに永久アクセス。追加料金なし。',
+};
 
 // プレミアム機能定義
 export const PREMIUM_FEATURES: PremiumFeature[] = [
   {
-    id: 'advanced_tactics',
-    name: '高度な戦術分析',
-    description: 'AI による詳細な戦術分析と改善提案',
+    id: 'all_techniques',
+    name: 'すべての基本技術',
+    description: '全16種類の基本技術にアクセス',
     icon: '🎯',
     requiresPremium: true,
   },
   {
-    id: 'pro_videos',
-    name: 'プロ選手の詳細動画解説',
-    description: 'プロ選手による技術解説ビデオ',
-    icon: '🎬',
+    id: 'all_glossary',
+    name: 'すべての用語辞典',
+    description: '全127個の用語を検索・閲覧',
+    icon: '📚',
     requiresPremium: true,
   },
   {
-    id: 'video_lessons',
-    name: 'ビデオレッスン',
-    description: 'プロコーチによる実践的なレッスン動画',
-    icon: '🎓',
-    requiresPremium: true,
-  },
-  {
-    id: 'practice_plan',
-    name: '練習計画の自動生成',
-    description: 'AI が最適な練習計画を自動生成',
+    id: 'all_practice_menus',
+    name: 'すべての練習メニュー',
+    description: '全37種類の練習メニュー',
     icon: '📋',
     requiresPremium: true,
   },
   {
-    id: 'priority_support',
-    name: '優先サポート',
-    description: '24時間以内のサポート対応',
-    icon: '💬',
+    id: 'all_training',
+    name: 'すべての体幹トレーニング',
+    description: '全37種類の体幹トレーニング',
+    icon: '💪',
     requiresPremium: true,
   },
   {
+    id: 'all_pro_players',
+    name: 'すべてのプロ選手情報',
+    description: '世界ランキング全100名の詳細情報',
+    icon: '⭐',
+    requiresPremium: true,
+  },
+  {
+    id: 'ai_analysis',
+    name: 'AI戦術分析',
+    description: 'AI による詳細な戦術分析',
+    icon: '🤖',
+    requiresPremium: true,
+  },
+  {
+    id: 'video_lessons',
+    name: '動画解説',
+    description: 'プロ選手による動画解説',
+    icon: '🎬',
+    requiresPremium: true,
+  },
+  {
+    id: 'practice_tracking',
+    name: '練習記録管理',
+    description: '練習の記録と進捗管理',
+    icon: '📊',
+    requiresPremium: true,
+  },
+  {
+    id: 'basic_techniques',
+    name: '基本技術（最初の5種類）',
+    description: 'フォアハンド、バックハンド等の基本技術',
+    icon: '🏓',
+    requiresPremium: false,
+  },
+  {
     id: 'basic_glossary',
-    name: '基本用語辞典',
-    description: '基本的な格闘技用語の解説',
-    icon: '📚',
+    name: '基本用語辞典（最初の30個）',
+    description: '基本的な卓球用語の解説',
+    icon: '📖',
     requiresPremium: false,
   },
 ];
 
 /**
- * サブスクリプション情報を保存
+ * 7日間無料トライアルを開始
  */
-export async function saveSubscription(subscription: PremiumSubscription): Promise<void> {
+export async function startFreeTrial(): Promise<void> {
   try {
-    await AsyncStorage.setItem(SUBSCRIPTION_KEY, JSON.stringify(subscription));
+    const trialData = {
+      startDate: Date.now(),
+      endDate: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7日間
+    };
+    await AsyncStorage.setItem(TRIAL_KEY, JSON.stringify(trialData));
   } catch (error) {
-    console.error('Error saving subscription:', error);
+    console.error('Error starting free trial:', error);
   }
 }
 
 /**
- * サブスクリプション情報を取得
+ * 無料トライアル情報を取得
  */
-export async function getSubscription(): Promise<PremiumSubscription | null> {
+export async function getFreeTrial(): Promise<{ startDate: number; endDate: number } | null> {
   try {
-    const data = await AsyncStorage.getItem(SUBSCRIPTION_KEY);
+    const data = await AsyncStorage.getItem(TRIAL_KEY);
     if (!data) return null;
 
-    const subscription = JSON.parse(data);
+    const trial = JSON.parse(data);
 
     // 有効期限をチェック
-    if (subscription.endDate < Date.now()) {
+    if (trial.endDate < Date.now()) {
       // 期限切れの場合は削除
-      await removeSubscription();
+      await removeFreeTrial();
       return null;
     }
 
-    return subscription;
+    return trial;
   } catch (error) {
-    console.error('Error getting subscription:', error);
+    console.error('Error getting free trial:', error);
     return null;
   }
 }
 
 /**
- * サブスクリプションを削除
+ * 無料トライアルを削除
  */
-export async function removeSubscription(): Promise<void> {
+export async function removeFreeTrial(): Promise<void> {
   try {
-    await AsyncStorage.removeItem(SUBSCRIPTION_KEY);
+    await AsyncStorage.removeItem(TRIAL_KEY);
   } catch (error) {
-    console.error('Error removing subscription:', error);
+    console.error('Error removing free trial:', error);
   }
 }
 
 /**
- * ユーザーがプレミアムユーザーかチェック
+ * 無料トライアルが有効かチェック
+ */
+export async function isInFreeTrial(): Promise<boolean> {
+  const trial = await getFreeTrial();
+  return trial !== null;
+}
+
+/**
+ * 無料トライアルの残り日数を計算
+ */
+export async function getFreeTrialRemainingDays(): Promise<number> {
+  const trial = await getFreeTrial();
+
+  if (!trial) {
+    return 0;
+  }
+
+  const remainingMs = trial.endDate - Date.now();
+  return Math.ceil(remainingMs / (1000 * 60 * 60 * 24));
+}
+
+/**
+ * 購入情報を保存（買い切り型）
+ */
+export async function savePurchase(userId: string): Promise<void> {
+  try {
+    const purchase: PremiumPurchase = {
+      userId,
+      purchaseDate: Date.now(),
+      expiryDate: null, // 買い切り型なので永久アクセス
+      status: 'active',
+    };
+    await AsyncStorage.setItem(PURCHASE_KEY, JSON.stringify(purchase));
+  } catch (error) {
+    console.error('Error saving purchase:', error);
+  }
+}
+
+/**
+ * 購入情報を取得
+ */
+export async function getPurchase(): Promise<PremiumPurchase | null> {
+  try {
+    const data = await AsyncStorage.getItem(PURCHASE_KEY);
+    if (!data) return null;
+
+    const purchase = JSON.parse(data);
+    return purchase;
+  } catch (error) {
+    console.error('Error getting purchase:', error);
+    return null;
+  }
+}
+
+/**
+ * 購入情報を削除
+ */
+export async function removePurchase(): Promise<void> {
+  try {
+    await AsyncStorage.removeItem(PURCHASE_KEY);
+  } catch (error) {
+    console.error('Error removing purchase:', error);
+  }
+}
+
+/**
+ * ユーザーがプレミアムユーザーかチェック（購入済みまたは無料トライアル中）
  */
 export async function isPremiumUser(): Promise<boolean> {
-  const subscription = await getSubscription();
-  return subscription !== null && subscription.status === 'active';
+  // 購入済みかチェック
+  const purchase = await getPurchase();
+  if (purchase && purchase.status === 'active') {
+    return true;
+  }
+
+  // 無料トライアル中かチェック
+  const inTrial = await isInFreeTrial();
+  return inTrial;
 }
 
 /**
@@ -185,15 +272,8 @@ export async function isFeatureUnlocked(featureId: string): Promise<boolean> {
 /**
  * プレミアムプランを取得
  */
-export function getPremiumPlan(planId: string): PremiumPlan | undefined {
-  return PREMIUM_PLANS.find((p) => p.id === planId);
-}
-
-/**
- * すべてのプレミアムプランを取得
- */
-export function getAllPremiumPlans(): PremiumPlan[] {
-  return PREMIUM_PLANS;
+export function getPremiumPlan(): PremiumPlan {
+  return PREMIUM_PLAN;
 }
 
 /**
@@ -211,28 +291,42 @@ export function getAllPremiumFeatures(): PremiumFeature[] {
 }
 
 /**
- * サブスクリプションの残り日数を計算
+ * 無料版で見放題にするコンテンツ数を取得
  */
-export async function getRemainingDays(): Promise<number> {
-  const subscription = await getSubscription();
-
-  if (!subscription) {
-    return 0;
-  }
-
-  const remainingMs = subscription.endDate - Date.now();
-  return Math.ceil(remainingMs / (1000 * 60 * 60 * 24));
-}
+export const FREE_TIER_LIMITS = {
+  techniques: 5, // 最初の5種類
+  glossary: 30, // 最初の30個
+  practiceMenus: 10, // 最初の10個
+  training: 10, // 最初の10個
+  proPlayers: 10, // ランキング1-10位
+};
 
 /**
- * サブスクリプションの更新日を取得
+ * 無料版でアクセス可能なコンテンツかチェック
  */
-export async function getNextBillingDate(): Promise<Date | null> {
-  const subscription = await getSubscription();
-
-  if (!subscription) {
-    return null;
+export async function canAccessContent(
+  contentType: 'technique' | 'glossary' | 'practiceMenu' | 'training' | 'proPlayer',
+  index: number
+): Promise<boolean> {
+  const isPremium = await isPremiumUser();
+  if (isPremium) {
+    return true; // プレミアムユーザーはすべてアクセス可能
   }
 
-  return new Date(subscription.endDate);
+  // 無料版の制限をチェック
+  const limits = FREE_TIER_LIMITS;
+  switch (contentType) {
+    case 'technique':
+      return index < limits.techniques;
+    case 'glossary':
+      return index < limits.glossary;
+    case 'practiceMenu':
+      return index < limits.practiceMenus;
+    case 'training':
+      return index < limits.training;
+    case 'proPlayer':
+      return index < limits.proPlayers;
+    default:
+      return false;
+  }
 }

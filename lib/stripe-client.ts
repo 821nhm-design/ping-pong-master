@@ -1,5 +1,5 @@
 /**
- * Stripe決済クライアント
+ * Stripe決済クライアント（買い切り型）
  * フロントエンドから決済処理を実行するためのユーティリティ
  */
 
@@ -10,21 +10,22 @@ export type CheckoutSessionResponse = {
   error?: string;
 };
 
-export type SubscriptionResponse = {
+export type PurchaseResponse = {
   success: boolean;
-  subscription?: {
+  purchase?: {
     id: string;
     userId: string;
     planId: string;
-    status: 'active' | 'canceled' | 'expired';
-    startDate: number;
-    endDate: number;
+    status: 'completed' | 'pending' | 'failed';
+    purchaseDate: number;
+    amount: number;
+    currency: string;
   };
   error?: string;
 };
 
 /**
- * 決済セッションを作成
+ * 決済セッションを作成（買い切り型）
  */
 export async function createCheckoutSession(
   planId: string,
@@ -41,6 +42,7 @@ export async function createCheckoutSession(
         planId,
         userEmail,
         userId,
+        billingType: 'onetime', // 買い切り型を指定
       }),
     });
 
@@ -60,11 +62,11 @@ export async function createCheckoutSession(
 }
 
 /**
- * ユーザーのサブスクリプション情報を取得
+ * ユーザーの購入情報を取得
  */
-export async function getSubscription(userId: string): Promise<SubscriptionResponse> {
+export async function getPurchase(userId: string): Promise<PurchaseResponse> {
   try {
-    const response = await fetch(`/api/stripe/subscription/${userId}`, {
+    const response = await fetch(`/api/stripe/purchase/${userId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -78,7 +80,7 @@ export async function getSubscription(userId: string): Promise<SubscriptionRespo
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error fetching subscription:', error);
+    console.error('Error fetching purchase:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -87,21 +89,25 @@ export async function getSubscription(userId: string): Promise<SubscriptionRespo
 }
 
 /**
- * サブスクリプションをキャンセル
+ * 購入を記録（Webhook用）
  */
-export async function cancelSubscription(
+export async function recordPurchase(
   userId: string,
-  subscriptionId: string
-): Promise<{ success: boolean; error?: string }> {
+  planId: string,
+  amount: number,
+  currency: string
+): Promise<PurchaseResponse> {
   try {
-    const response = await fetch('/api/stripe/cancel-subscription', {
+    const response = await fetch('/api/stripe/record-purchase', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         userId,
-        subscriptionId,
+        planId,
+        amount,
+        currency,
       }),
     });
 
@@ -112,7 +118,7 @@ export async function cancelSubscription(
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error canceling subscription:', error);
+    console.error('Error recording purchase:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',

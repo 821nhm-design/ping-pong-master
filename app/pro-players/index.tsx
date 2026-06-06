@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScrollView, Text, View, Pressable, FlatList } from 'react-native';
 import { ScreenContainer } from '@/components/screen-container';
 import { useRouter } from 'expo-router';
 import { proPlayersMega } from '@/lib/pro-players-mega';
 import { womenProPlayersMega } from '@/lib/pro-players-women-mega';
+import { isPremiumUser, FREE_TIER_LIMITS } from '@/lib/premium-utils';
 
 const rankingColors = {
   1: '#FFD700',
@@ -15,14 +16,29 @@ export default function ProPlayersScreen() {
   const router = useRouter();
   const [activeGender, setActiveGender] = useState<'male' | 'female'>('male');
   const [activeCategory, setActiveCategory] = useState<string>('top10');
+  const [isPremium, setIsPremium] = useState(false);
+
+  useEffect(() => {
+    checkPremiumStatus();
+  }, []);
+
+  const checkPremiumStatus = async () => {
+    const premium = await isPremiumUser();
+    setIsPremium(premium);
+  };
 
   const allPlayers = activeGender === 'female' ? womenProPlayersMega : proPlayersMega;
 
-  const filteredPlayers = activeCategory === 'top10' 
+  let filteredPlayers = activeCategory === 'top10' 
     ? allPlayers.slice(0, 10).sort((a, b) => a.rank - b.rank)
     : activeCategory === 'top50'
     ? allPlayers.slice(0, 50).sort((a, b) => a.rank - b.rank)
     : allPlayers.sort((a, b) => a.rank - b.rank);
+
+  // 無料版の場合は最初の10人のみ表示
+  if (!isPremium && activeCategory !== 'top10') {
+    filteredPlayers = allPlayers.slice(0, FREE_TIER_LIMITS.proPlayers).sort((a, b) => a.rank - b.rank);
+  }
 
   const getRankingColor = (ranking: number) => {
     if (ranking === 1) return rankingColors[1];
@@ -142,20 +158,26 @@ export default function ProPlayersScreen() {
             <View className="flex-row gap-2">
               {[
                 { id: 'top10', name: 'トップ10' },
-                { id: 'top50', name: 'トップ50' },
-                { id: 'top100', name: 'トップ100' },
+                { id: 'top50', name: 'トップ50', disabled: !isPremium },
+                { id: 'top100', name: 'トップ100', disabled: !isPremium },
               ].map((category) => {
                 const isActive = activeCategory === category.id;
                 return (
                   <Pressable
                     key={category.id}
-                    onPress={() => setActiveCategory(category.id)}
+                    onPress={() => {
+                      if (category.disabled) {
+                        router.push('/premium');
+                      } else {
+                        setActiveCategory(category.id);
+                      }
+                    }}
                     style={({ pressed }) => [
                       {
                         paddingHorizontal: 14,
                         paddingVertical: 10,
                         borderRadius: 20,
-                        backgroundColor: isActive ? '#FF6B35' : '#F0F0F0',
+                        backgroundColor: isActive ? '#FF6B35' : category.disabled ? '#CCCCCC' : '#F0F0F0',
                         opacity: pressed ? 0.8 : 1,
                       },
                     ]}
@@ -164,6 +186,7 @@ export default function ProPlayersScreen() {
                       className={isActive ? 'text-white font-bold text-sm' : 'text-foreground font-semibold text-sm'}
                     >
                       {category.name}
+                      {category.disabled && ' 🔒'}
                     </Text>
                   </Pressable>
                 );

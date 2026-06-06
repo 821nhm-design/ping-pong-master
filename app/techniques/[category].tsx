@@ -1,14 +1,30 @@
 import { FlatList, Text, View, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useState, useEffect } from "react";
 import { ScreenContainer } from "@/components/screen-container";
 import { getTechniquesByCategory, CATEGORIES } from "@/lib/techniques-data";
+import { isPremiumUser, FREE_TIER_LIMITS } from "@/lib/premium-utils";
 
 export default function TechniqueListScreen() {
   const { category } = useLocalSearchParams<{ category: string }>();
   const router = useRouter();
+  const [isPremium, setIsPremium] = useState(false);
+
+  useEffect(() => {
+    checkPremiumStatus();
+  }, []);
+
+  const checkPremiumStatus = async () => {
+    const premium = await isPremiumUser();
+    setIsPremium(premium);
+  };
 
   const techniques = category ? getTechniquesByCategory(category as "attack" | "tabletop" | "defense" | "serve" | "other") : [];
   const categoryInfo = CATEGORIES.find((c) => c.id === category);
+  
+  // 無料版の場合は最初の5つのみ表示
+  const visibleTechniques = isPremium ? techniques : techniques.slice(0, FREE_TIER_LIMITS.techniques);
+  const lockedCount = !isPremium ? Math.max(0, techniques.length - FREE_TIER_LIMITS.techniques) : 0;
 
   const handleTechniquePress = (techniqueId: string) => {
     router.push({
@@ -30,7 +46,7 @@ export default function TechniqueListScreen() {
 
       {/* Technique List */}
       <FlatList
-        data={techniques}
+        data={visibleTechniques}
         keyExtractor={(item) => item.id}
         scrollEnabled={false}
         renderItem={({ item }) => (
@@ -56,6 +72,23 @@ export default function TechniqueListScreen() {
             </View>
           </TouchableOpacity>
         )}
+        ListFooterComponent={
+          lockedCount > 0 ? (
+            <View className="p-4 bg-surface rounded-lg border border-border mt-4">
+              <Text className="text-foreground font-semibold mb-3">
+                🔒 {lockedCount}個のコンテンツがロック中
+              </Text>
+              <TouchableOpacity
+                onPress={() => router.push('/premium')}
+                className="bg-primary px-4 py-2 rounded-full"
+              >
+                <Text className="text-white font-semibold text-center">
+                  プレミアムで全て見る
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : null
+        }
         contentContainerStyle={{ paddingBottom: 20 }}
       />
     </ScreenContainer>
