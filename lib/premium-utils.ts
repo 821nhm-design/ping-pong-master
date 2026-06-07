@@ -33,7 +33,7 @@ const PREMIUM_FEATURES_KEY = 'ping_pong_premium_features';
 export const PREMIUM_PLAN: PremiumPlan = {
   id: 'pro',
   name: 'Ping Pong Master Pro',
-  price: 3580,
+  price: 1500,
   currency: 'JPY',
   billingPeriod: 'onetime',
   features: [
@@ -44,7 +44,7 @@ export const PREMIUM_PLAN: PremiumPlan = {
     '練習記録管理',
     '永久アクセス（追加料金なし）',
   ],
-  description: '一度の購入ですべてのコンテンツに永久アクセス。追加料金なし。',
+  description: '一度の購入（¥1,500）ですべてのコンテンツに永久アクセス。追加料金なし。',
 };
 
 // プレミアム機能定義
