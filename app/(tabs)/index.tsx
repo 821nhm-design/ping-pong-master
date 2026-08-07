@@ -13,8 +13,10 @@ const resourceColors = [
   { bg: "#FFE8D6", border: "#FF6B35", icon: "🌟" },
 ];
 
-// 卓球の強い順に並べ替え（中国→日本→韓国→Tリーグ→沖縄を最後）
-const RELATED_SITES = [
+// ─── 卓球関連サイト ───────────────────────────────────────────
+
+// カテゴリ①：世界の卓球協会（強い順）
+const WORLD_ASSOC_SITES = [
   {
     name: "中国卓球協会（CTTA）",
     nameEn: "Chinese Table Tennis Association",
@@ -45,6 +47,10 @@ const RELATED_SITES = [
     bgColor: "#EFF4FF",
     tag: "韓国 🥉",
   },
+];
+
+// カテゴリ②：国内リーグ・地域協会
+const DOMESTIC_SITES = [
   {
     name: "卓球 Tリーグ",
     nameEn: "T.LEAGUE",
@@ -65,6 +71,10 @@ const RELATED_SITES = [
     bgColor: "#E8F5E9",
     tag: "沖縄",
   },
+];
+
+// カテゴリ③：障害者卓球関連
+const PARA_SITES = [
   {
     name: "沖縄県障害者卓球協会",
     nameEn: "Okinawa Disability Table Tennis Association",
@@ -117,17 +127,10 @@ const RELATED_SITES = [
   },
 ];
 
-const YOUTUBE_CHANNELS = [
-  {
-    name: "World Table Tennis",
-    handle: "@wttglobal",
-    description: "世界大会のフルマッチ・ハイライトを配信する公式チャンネル",
-    subscribers: "135万人",
-    url: "https://www.youtube.com/@wttglobal",
-    emoji: "🏆",
-    accentColor: "#E53E3E",
-    bgColor: "#FFF5F5",
-  },
+// ─── YouTubeチャンネル ─────────────────────────────────────────
+
+// カテゴリ④：世界の卓球YouTube（登録者数順）
+const WORLD_YT_CHANNELS = [
   {
     name: "Pongfinity",
     handle: "@pongfinity",
@@ -137,6 +140,16 @@ const YOUTUBE_CHANNELS = [
     emoji: "🎬",
     accentColor: "#FF6B35",
     bgColor: "#FFF4EE",
+  },
+  {
+    name: "World Table Tennis",
+    handle: "@wttglobal",
+    description: "世界大会のフルマッチ・ハイライトを配信する公式チャンネル",
+    subscribers: "135万人",
+    url: "https://www.youtube.com/@wttglobal",
+    emoji: "🏆",
+    accentColor: "#E53E3E",
+    bgColor: "#FFF5F5",
   },
   {
     name: "TableTennisDaily",
@@ -198,16 +211,10 @@ const YOUTUBE_CHANNELS = [
     accentColor: "#FF0000",
     bgColor: "#FFF8F8",
   },
-  {
-    name: "卓球TV（JTTA公式）",
-    handle: "@tabletennis",
-    description: "日本卓球協会公式動画配信サイト。全日本選手権・代表戦・大会ライブ配信",
-    subscribers: "実況未公開",
-    url: "https://www.youtube.com/@tabletennis",
-    emoji: "🇯🇵",
-    accentColor: "#BC002D",
-    bgColor: "#FFF5F5",
-  },
+];
+
+// カテゴリ⑤：日本の卓球YouTube
+const JAPAN_YT_CHANNELS = [
   {
     name: "T.LEAGUE",
     handle: "@tleague",
@@ -218,7 +225,41 @@ const YOUTUBE_CHANNELS = [
     accentColor: "#0047AB",
     bgColor: "#EFF6FF",
   },
+  {
+    name: "卓球TV（JTTA公式）",
+    handle: "@tabletennis",
+    description: "日本卓球協会公式動画配信サイト。全日本選手権・代表戦・大会ライブ配信",
+    subscribers: "JTTA公式",
+    url: "https://www.youtube.com/@tabletennis",
+    emoji: "🇯🇵",
+    accentColor: "#BC002D",
+    bgColor: "#FFF5F5",
+  },
 ];
+
+// ─── 共通カードコンポーネント用ヘルパー ────────────────────────
+
+type SiteItem = {
+  name: string;
+  nameEn: string;
+  description: string;
+  url: string;
+  emoji: string;
+  accentColor: string;
+  bgColor: string;
+  tag: string;
+};
+
+type ChannelItem = {
+  name: string;
+  handle: string;
+  description: string;
+  subscribers: string;
+  url: string;
+  emoji: string;
+  accentColor: string;
+  bgColor: string;
+};
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -240,9 +281,85 @@ export default function HomeScreen() {
     });
   };
 
-  const handleChannelPress = (url: string) => {
+  const handleLinkPress = (url: string) => {
     Linking.openURL(url);
   };
+
+  const renderSiteCard = (site: SiteItem) => (
+    <TouchableOpacity
+      key={site.url}
+      onPress={() => handleLinkPress(site.url)}
+      style={{ backgroundColor: site.bgColor, borderLeftColor: site.accentColor }}
+      className="rounded-xl p-4 border-l-4 mb-3 active:opacity-75"
+    >
+      <View className="flex-row items-start justify-between">
+        <View className="flex-1">
+          <View className="flex-row items-center mb-1">
+            <Text className="text-xl mr-2">{site.emoji}</Text>
+            <Text className="text-base font-bold flex-1" style={{ color: site.accentColor }}>
+              {site.name}
+            </Text>
+          </View>
+          <Text className="text-xs text-muted mb-1">{site.nameEn}</Text>
+          <Text className="text-sm text-foreground leading-relaxed">{site.description}</Text>
+        </View>
+        <View className="ml-3 items-end">
+          <View
+            style={{ backgroundColor: site.accentColor + "20" }}
+            className="rounded-full px-2 py-1 mb-1"
+          >
+            <Text className="text-xs font-bold" style={{ color: site.accentColor }}>
+              {site.tag}
+            </Text>
+          </View>
+          <Text className="text-lg">→</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+
+  const renderChannelCard = (channel: ChannelItem) => (
+    <TouchableOpacity
+      key={channel.handle}
+      onPress={() => handleLinkPress(channel.url)}
+      style={{ backgroundColor: channel.bgColor, borderLeftColor: channel.accentColor }}
+      className="rounded-xl p-4 border-l-4 mb-3 active:opacity-75"
+    >
+      <View className="flex-row items-start justify-between">
+        <View className="flex-1">
+          <View className="flex-row items-center mb-1">
+            <Text className="text-xl mr-2">{channel.emoji}</Text>
+            <Text className="text-base font-bold" style={{ color: channel.accentColor }}>
+              {channel.name}
+            </Text>
+          </View>
+          <Text className="text-xs text-muted mb-1">{channel.handle}</Text>
+          <Text className="text-sm text-foreground leading-relaxed">{channel.description}</Text>
+        </View>
+        <View className="ml-3 items-end">
+          <View
+            style={{ backgroundColor: channel.accentColor + "20" }}
+            className="rounded-full px-2 py-1 mb-1"
+          >
+            <Text className="text-xs font-bold" style={{ color: channel.accentColor }}>
+              {channel.subscribers}
+            </Text>
+          </View>
+          <Text className="text-lg">→</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+
+  const renderSectionHeader = (emoji: string, title: string, subtitle: string) => (
+    <View className="mb-3">
+      <View className="flex-row items-center mb-1">
+        <Text className="text-2xl mr-2">{emoji}</Text>
+        <Text className="text-lg font-bold text-foreground">{title}</Text>
+      </View>
+      <Text className="text-xs text-muted">{subtitle}</Text>
+    </View>
+  );
 
   return (
     <ScreenContainer className="p-0 flex-1">
@@ -282,11 +399,9 @@ export default function HomeScreen() {
             </View>
           </View>
 
-          {/* その他のリソース */}
+          {/* 学習リソース */}
           <View className="mt-2">
             <Text className="text-lg font-bold text-foreground mb-3">学習リソース</Text>
-
-            {/* 用語辞典 */}
             <TouchableOpacity
               onPress={() => router.push("/glossary-expanded")}
               style={{ backgroundColor: resourceColors[0].bg, borderLeftColor: resourceColors[0].border }}
@@ -299,8 +414,6 @@ export default function HomeScreen() {
               <Text className="text-lg font-bold text-foreground mb-1">用語辞典（127個）</Text>
               <Text className="text-sm text-muted">ルール・道具・技術・戦術など全て</Text>
             </TouchableOpacity>
-
-            {/* 体幹トレーニング */}
             <TouchableOpacity
               onPress={() => router.push("/core-training")}
               style={{ backgroundColor: resourceColors[1].bg, borderLeftColor: resourceColors[1].border }}
@@ -313,8 +426,6 @@ export default function HomeScreen() {
               <Text className="text-lg font-bold text-foreground mb-1">体幹トレーニング</Text>
               <Text className="text-sm text-muted">体を鍛えてパフォーマンスアップ</Text>
             </TouchableOpacity>
-
-            {/* 練習メニュー */}
             <TouchableOpacity
               onPress={() => router.push("/training")}
               style={{ backgroundColor: resourceColors[2].bg, borderLeftColor: resourceColors[2].border }}
@@ -327,8 +438,6 @@ export default function HomeScreen() {
               <Text className="text-lg font-bold text-foreground mb-1">練習メニュー</Text>
               <Text className="text-sm text-muted">レベル別の練習方法を学ぶ</Text>
             </TouchableOpacity>
-
-            {/* プロ選手 */}
             <TouchableOpacity
               onPress={() => router.push("/pro-players")}
               style={{ backgroundColor: resourceColors[3].bg, borderLeftColor: resourceColors[3].border }}
@@ -343,112 +452,34 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* 卓球関連サイト（強い順） */}
+          {/* ① 世界の卓球協会サイト */}
           <View className="mt-2">
-            <View className="flex-row items-center mb-3">
-              <Text className="text-2xl mr-2">🌐</Text>
-              <Text className="text-lg font-bold text-foreground">卓球関連サイト</Text>
-            </View>
-            <Text className="text-sm text-muted mb-4">
-              国内外の卓球協会・リーグの公式サイトをチェック
-            </Text>
-            {RELATED_SITES.map((site) => (
-              <TouchableOpacity
-                key={site.url}
-                onPress={() => handleChannelPress(site.url)}
-                style={{
-                  backgroundColor: site.bgColor,
-                  borderLeftColor: site.accentColor,
-                }}
-                className="rounded-xl p-4 border-l-4 mb-3 active:opacity-75"
-              >
-                <View className="flex-row items-start justify-between">
-                  <View className="flex-1">
-                    <View className="flex-row items-center mb-1">
-                      <Text className="text-xl mr-2">{site.emoji}</Text>
-                      <Text
-                        className="text-base font-bold flex-1"
-                        style={{ color: site.accentColor }}
-                      >
-                        {site.name}
-                      </Text>
-                    </View>
-                    <Text className="text-xs text-muted mb-1">{site.nameEn}</Text>
-                    <Text className="text-sm text-foreground leading-relaxed">
-                      {site.description}
-                    </Text>
-                  </View>
-                  <View className="ml-3 items-end">
-                    <View
-                      style={{ backgroundColor: site.accentColor + "20" }}
-                      className="rounded-full px-2 py-1 mb-1"
-                    >
-                      <Text
-                        className="text-xs font-bold"
-                        style={{ color: site.accentColor }}
-                      >
-                        {site.tag}
-                      </Text>
-                    </View>
-                    <Text className="text-lg">→</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))}
+            {renderSectionHeader("🌐", "世界の卓球協会", "強豪国の公式サイト（強い順）")}
+            {WORLD_ASSOC_SITES.map(renderSiteCard)}
           </View>
 
-          {/* おすすめYouTubeチャンネル */}
+          {/* ② 国内リーグ・地域協会 */}
           <View className="mt-2">
-            <View className="flex-row items-center mb-3">
-              <Text className="text-2xl mr-2">▶️</Text>
-              <Text className="text-lg font-bold text-foreground">おすすめYouTubeチャンネル</Text>
-            </View>
-            <Text className="text-sm text-muted mb-4">
-              世界の卓球トップチャンネルで試合・技術・最新情報をチェック
-            </Text>
-            {YOUTUBE_CHANNELS.map((channel) => (
-              <TouchableOpacity
-                key={channel.handle}
-                onPress={() => handleChannelPress(channel.url)}
-                style={{
-                  backgroundColor: channel.bgColor,
-                  borderLeftColor: channel.accentColor,
-                }}
-                className="rounded-xl p-4 border-l-4 mb-3 active:opacity-75"
-              >
-                <View className="flex-row items-start justify-between">
-                  <View className="flex-1">
-                    <View className="flex-row items-center mb-1">
-                      <Text className="text-xl mr-2">{channel.emoji}</Text>
-                      <Text
-                        className="text-base font-bold"
-                        style={{ color: channel.accentColor }}
-                      >
-                        {channel.name}
-                      </Text>
-                    </View>
-                    <Text className="text-xs text-muted mb-1">{channel.handle}</Text>
-                    <Text className="text-sm text-foreground leading-relaxed">
-                      {channel.description}
-                    </Text>
-                  </View>
-                  <View className="ml-3 items-end">
-                    <View
-                      style={{ backgroundColor: channel.accentColor + "20" }}
-                      className="rounded-full px-2 py-1 mb-1"
-                    >
-                      <Text
-                        className="text-xs font-bold"
-                        style={{ color: channel.accentColor }}
-                      >
-                        {channel.subscribers}
-                      </Text>
-                    </View>
-                    <Text className="text-lg">→</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))}
+            {renderSectionHeader("🏅", "国内リーグ・地域協会", "Tリーグ・沖縄県卓球協会の公式サイト")}
+            {DOMESTIC_SITES.map(renderSiteCard)}
+          </View>
+
+          {/* ③ 障害者卓球関連サイト */}
+          <View className="mt-2">
+            {renderSectionHeader("♿", "障害者卓球関連サイト", "パラ卓球・全障スポ・沖縄障害者卓球の公式サイト")}
+            {PARA_SITES.map(renderSiteCard)}
+          </View>
+
+          {/* ④ 世界の卓球YouTubeチャンネル */}
+          <View className="mt-2">
+            {renderSectionHeader("▶️", "世界の卓球YouTube", "登録者数の多い世界トップチャンネル（8チャンネル）")}
+            {WORLD_YT_CHANNELS.map(renderChannelCard)}
+          </View>
+
+          {/* ⑤ 日本の卓球YouTubeチャンネル */}
+          <View className="mt-2">
+            {renderSectionHeader("🇯🇵", "日本の卓球YouTube", "JTTA公式・Tリーグ公式チャンネル")}
+            {JAPAN_YT_CHANNELS.map(renderChannelCard)}
           </View>
 
           {/* プレミアムバナー */}
