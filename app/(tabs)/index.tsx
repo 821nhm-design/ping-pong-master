@@ -1,6 +1,7 @@
 import { ScrollView, Text, View, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { useState, useEffect } from "react";
+import * as Linking from "expo-linking";
 import { ScreenContainer } from "@/components/screen-container";
 import { CATEGORIES } from "@/lib/techniques-data";
 import { isPremiumUser } from "@/lib/premium-utils";
@@ -10,6 +11,59 @@ const resourceColors = [
   { bg: "#D4F1F4", border: "#004E89", icon: "💪" },
   { bg: "#FFF4E6", border: "#F77F00", icon: "🎯" },
   { bg: "#FFE8D6", border: "#FF6B35", icon: "🌟" },
+];
+
+const YOUTUBE_CHANNELS = [
+  {
+    name: "World Table Tennis",
+    handle: "@wttglobal",
+    description: "世界大会のフルマッチ・ハイライトを配信する公式チャンネル",
+    subscribers: "135万人",
+    url: "https://www.youtube.com/@wttglobal",
+    emoji: "🏆",
+    accentColor: "#E53E3E",
+    bgColor: "#FFF5F5",
+  },
+  {
+    name: "Pongfinity",
+    handle: "@pongfinity",
+    description: "世界最大の卓球エンタメチャンネル。トリック動画が大人気",
+    subscribers: "470万人",
+    url: "https://www.youtube.com/@pongfinity",
+    emoji: "🎬",
+    accentColor: "#FF6B35",
+    bgColor: "#FFF4EE",
+  },
+  {
+    name: "TableTennisDaily",
+    handle: "@tabletennisdaily",
+    description: "プロ選手インタビュー・技術解説・試合動画が充実",
+    subscribers: "51万人",
+    url: "https://www.youtube.com/@tabletennisdaily",
+    emoji: "📺",
+    accentColor: "#2B6CB0",
+    bgColor: "#EBF8FF",
+  },
+  {
+    name: "ITTF World",
+    handle: "@ITTFWorld",
+    description: "国際卓球連盟の公式チャンネル。パラ卓球・歴史的名勝負も収録",
+    subscribers: "13万人",
+    url: "https://www.youtube.com/@ITTFWorld",
+    emoji: "🌍",
+    accentColor: "#276749",
+    bgColor: "#F0FFF4",
+  },
+  {
+    name: "ETTU OFFICIAL",
+    handle: "@ettutvofficial",
+    description: "ヨーロッパ卓球連合公式。欧州選手権・チャンピオンズリーグを配信",
+    subscribers: "3.7万人",
+    url: "https://www.youtube.com/@ettutvofficial",
+    emoji: "🇪🇺",
+    accentColor: "#553C9A",
+    bgColor: "#FAF5FF",
+  },
 ];
 
 export default function HomeScreen() {
@@ -30,6 +84,10 @@ export default function HomeScreen() {
       pathname: "/techniques/[category]",
       params: { category: categoryId },
     });
+  };
+
+  const handleChannelPress = (url: string) => {
+    Linking.openURL(url);
   };
 
   return (
@@ -129,6 +187,60 @@ export default function HomeScreen() {
               <Text className="text-lg font-bold text-foreground mb-1">プロ選手</Text>
               <Text className="text-sm text-muted">世界トップ選手の戦術を学ぶ</Text>
             </TouchableOpacity>
+          </View>
+
+          {/* おすすめYouTubeチャンネル */}
+          <View className="mt-2">
+            <View className="flex-row items-center mb-3">
+              <Text className="text-2xl mr-2">▶️</Text>
+              <Text className="text-lg font-bold text-foreground">おすすめYouTubeチャンネル</Text>
+            </View>
+            <Text className="text-sm text-muted mb-4">
+              世界の卓球トップチャンネルで試合・技術・最新情報をチェック
+            </Text>
+            {YOUTUBE_CHANNELS.map((channel) => (
+              <TouchableOpacity
+                key={channel.handle}
+                onPress={() => handleChannelPress(channel.url)}
+                style={{
+                  backgroundColor: channel.bgColor,
+                  borderLeftColor: channel.accentColor,
+                }}
+                className="rounded-xl p-4 border-l-4 mb-3 active:opacity-75"
+              >
+                <View className="flex-row items-start justify-between">
+                  <View className="flex-1">
+                    <View className="flex-row items-center mb-1">
+                      <Text className="text-xl mr-2">{channel.emoji}</Text>
+                      <Text
+                        className="text-base font-bold"
+                        style={{ color: channel.accentColor }}
+                      >
+                        {channel.name}
+                      </Text>
+                    </View>
+                    <Text className="text-xs text-muted mb-1">{channel.handle}</Text>
+                    <Text className="text-sm text-foreground leading-relaxed">
+                      {channel.description}
+                    </Text>
+                  </View>
+                  <View className="ml-3 items-end">
+                    <View
+                      style={{ backgroundColor: channel.accentColor + "20" }}
+                      className="rounded-full px-2 py-1 mb-1"
+                    >
+                      <Text
+                        className="text-xs font-bold"
+                        style={{ color: channel.accentColor }}
+                      >
+                        {channel.subscribers}
+                      </Text>
+                    </View>
+                    <Text className="text-lg">→</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
           </View>
 
           {/* プレミアムバナー */}
