@@ -13,6 +13,49 @@ const resourceColors = [
   { bg: "#FFE8D6", border: "#FF6B35", icon: "🌟" },
 ];
 
+const RELATED_SITES = [
+  {
+    name: "中国卓球協会（CTTA）",
+    nameEn: "Chinese Table Tennis Association",
+    description: "世界最強・中国卓球の総本山。代表選手情報・大会結果・最新ニュースを掲載",
+    url: "https://www.ctta.cn/",
+    emoji: "🇨🇳",
+    accentColor: "#C8102E",
+    bgColor: "#FFF0F0",
+    tag: "中国",
+  },
+  {
+    name: "日本卓球協会（JTTA）",
+    nameEn: "Japan Table Tennis Association",
+    description: "日本卓球の公式統括団体。全日本選手権・代表選手・大会日程を掲載",
+    url: "https://jtta.or.jp/",
+    emoji: "🇯🇵",
+    accentColor: "#BC002D",
+    bgColor: "#FFF5F5",
+    tag: "日本",
+  },
+  {
+    name: "卓球 Tリーグ",
+    nameEn: "T.LEAGUE",
+    description: "世界トップ選手が集う日本の卓球プロリーグ。試合日程・選手・チーム情報",
+    url: "https://tleague.jp/",
+    emoji: "🏅",
+    accentColor: "#0047AB",
+    bgColor: "#EFF6FF",
+    tag: "プロリーグ",
+  },
+  {
+    name: "沖縄県卓球協会",
+    nameEn: "Okinawa Table Tennis Association",
+    description: "沖縄県内の卓球競技を統括。大会情報・結果・地域卓球の最新情報",
+    url: "https://tta.okinawa/",
+    emoji: "🌺",
+    accentColor: "#00897B",
+    bgColor: "#E8F5E9",
+    tag: "沖縄",
+  },
+];
+
 const YOUTUBE_CHANNELS = [
   {
     name: "World Table Tennis",
@@ -187,6 +230,60 @@ export default function HomeScreen() {
               <Text className="text-lg font-bold text-foreground mb-1">プロ選手</Text>
               <Text className="text-sm text-muted">世界トップ選手の戦術を学ぶ</Text>
             </TouchableOpacity>
+          </View>
+
+          {/* 関連卓球サイト */}
+          <View className="mt-2">
+            <View className="flex-row items-center mb-3">
+              <Text className="text-2xl mr-2">🌐</Text>
+              <Text className="text-lg font-bold text-foreground">卓球関連サイト</Text>
+            </View>
+            <Text className="text-sm text-muted mb-4">
+              国内外の卓球協会・リーグの公式サイトをチェック
+            </Text>
+            {RELATED_SITES.map((site) => (
+              <TouchableOpacity
+                key={site.url}
+                onPress={() => handleChannelPress(site.url)}
+                style={{
+                  backgroundColor: site.bgColor,
+                  borderLeftColor: site.accentColor,
+                }}
+                className="rounded-xl p-4 border-l-4 mb-3 active:opacity-75"
+              >
+                <View className="flex-row items-start justify-between">
+                  <View className="flex-1">
+                    <View className="flex-row items-center mb-1">
+                      <Text className="text-xl mr-2">{site.emoji}</Text>
+                      <Text
+                        className="text-base font-bold flex-1"
+                        style={{ color: site.accentColor }}
+                      >
+                        {site.name}
+                      </Text>
+                    </View>
+                    <Text className="text-xs text-muted mb-1">{site.nameEn}</Text>
+                    <Text className="text-sm text-foreground leading-relaxed">
+                      {site.description}
+                    </Text>
+                  </View>
+                  <View className="ml-3 items-end">
+                    <View
+                      style={{ backgroundColor: site.accentColor + "20" }}
+                      className="rounded-full px-2 py-1 mb-1"
+                    >
+                      <Text
+                        className="text-xs font-bold"
+                        style={{ color: site.accentColor }}
+                      >
+                        {site.tag}
+                      </Text>
+                    </View>
+                    <Text className="text-lg">→</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
           </View>
 
           {/* おすすめYouTubeチャンネル */}
