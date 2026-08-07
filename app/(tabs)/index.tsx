@@ -13,6 +13,7 @@ const resourceColors = [
   { bg: "#FFE8D6", border: "#FF6B35", icon: "🌟" },
 ];
 
+// 卓球の強い順に並べ替え（中国→日本→韓国→Tリーグ→沖縄を最後）
 const RELATED_SITES = [
   {
     name: "中国卓球協会（CTTA）",
@@ -22,7 +23,7 @@ const RELATED_SITES = [
     emoji: "🇨🇳",
     accentColor: "#C8102E",
     bgColor: "#FFF0F0",
-    tag: "中国",
+    tag: "中国 🥇",
   },
   {
     name: "日本卓球協会（JTTA）",
@@ -32,7 +33,17 @@ const RELATED_SITES = [
     emoji: "🇯🇵",
     accentColor: "#BC002D",
     bgColor: "#FFF5F5",
-    tag: "日本",
+    tag: "日本 🥈",
+  },
+  {
+    name: "韓国卓球協会（KTTA）",
+    nameEn: "Korea Table Tennis Association",
+    description: "アジア屈指の強豪・韓国卓球の公式サイト。代表選手・大会情報を掲載",
+    url: "https://www.koreatta.or.kr/",
+    emoji: "🇰🇷",
+    accentColor: "#003478",
+    bgColor: "#EFF4FF",
+    tag: "韓国 🥉",
   },
   {
     name: "卓球 Tリーグ",
@@ -107,6 +118,36 @@ const YOUTUBE_CHANNELS = [
     accentColor: "#553C9A",
     bgColor: "#FAF5FF",
   },
+  {
+    name: "KTTATV 대한탁구협회",
+    handle: "@kttatv",
+    description: "韓国卓球協会の公式チャンネル。国内大会・代表選手の試合動画5,400本以上",
+    subscribers: "1.56万人",
+    url: "https://www.youtube.com/@kttatv",
+    emoji: "🇰🇷",
+    accentColor: "#003478",
+    bgColor: "#EFF4FF",
+  },
+  {
+    name: "USA Table Tennis",
+    handle: "@usatabletennis",
+    description: "全米卓球協会（USATT）公式。全米選手権・代表選手・大会ハイライトを配信",
+    subscribers: "2.1万人",
+    url: "https://www.youtube.com/@usatabletennis",
+    emoji: "🇺🇸",
+    accentColor: "#B22234",
+    bgColor: "#FFF5F5",
+  },
+  {
+    name: "Table Tennis Canada",
+    handle: "@TableTennisCanada",
+    description: "カナダ卓球協会（TTCAN）公式。カナダ代表選手・国内大会・育成動画を配信",
+    subscribers: "1,380人",
+    url: "https://www.youtube.com/c/TableTennisCanadaTennisdeTable",
+    emoji: "🇨🇦",
+    accentColor: "#FF0000",
+    bgColor: "#FFF8F8",
+  },
 ];
 
 export default function HomeScreen() {
@@ -174,7 +215,7 @@ export default function HomeScreen() {
           {/* その他のリソース */}
           <View className="mt-2">
             <Text className="text-lg font-bold text-foreground mb-3">学習リソース</Text>
-            
+
             {/* 用語辞典 */}
             <TouchableOpacity
               onPress={() => router.push("/glossary-expanded")}
@@ -232,7 +273,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* 関連卓球サイト */}
+          {/* 卓球関連サイト（強い順） */}
           <View className="mt-2">
             <View className="flex-row items-center mb-3">
               <Text className="text-2xl mr-2">🌐</Text>
