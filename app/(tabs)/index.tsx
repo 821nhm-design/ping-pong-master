@@ -13,44 +13,35 @@ const resourceColors = [
   { bg: "#FFE8D6", border: "#FF6B35", icon: "🌟" },
 ];
 
-// ─── 卓球関連サイト ───────────────────────────────────────────
+// ─── カテゴリ別データ定義 ──────────────────────────────────────────
 
-// カテゴリ①：世界の卓球協会（強い順）
-const WORLD_ASSOC_SITES = [
+type LinkItem = {
+  name: string;
+  nameEn?: string;
+  handle?: string;
+  description: string;
+  url: string;
+  emoji: string;
+  accentColor: string;
+  bgColor: string;
+  tag?: string;
+  subscribers?: string;
+  type: "site" | "youtube";
+};
+
+// 1. 日本の卓球サイト・チャンネル
+const JAPAN_LINKS: LinkItem[] = [
   {
-    name: "中国卓球協会（CTTA）",
-    nameEn: "Chinese Table Tennis Association",
-    description: "世界最強・中国卓球の総本山。代表選手情報・大会結果・最新ニュースを掲載",
-    url: "https://www.ctta.cn/",
-    emoji: "🇨🇳",
-    accentColor: "#C8102E",
-    bgColor: "#FFF0F0",
-    tag: "中国 🥇",
-  },
-  {
-    name: "日本卓球協会（JTTA）",
+    name: "日本卓球協会 (JTTA)",
     nameEn: "Japan Table Tennis Association",
     description: "日本卓球の公式統括団体。全日本選手権・代表選手・大会日程を掲載",
     url: "https://jtta.or.jp/",
     emoji: "🇯🇵",
     accentColor: "#BC002D",
     bgColor: "#FFF5F5",
-    tag: "日本 🥈",
+    tag: "日本公式",
+    type: "site",
   },
-  {
-    name: "韓国卓球協会（KTTA）",
-    nameEn: "Korea Table Tennis Association",
-    description: "アジア屈指の強豪・韓国卓球の公式サイト。代表選手・大会情報を掲載",
-    url: "https://www.koreatta.or.kr/",
-    emoji: "🇰🇷",
-    accentColor: "#003478",
-    bgColor: "#EFF4FF",
-    tag: "韓国 🥉",
-  },
-];
-
-// カテゴリ②：国内リーグ・地域協会
-const DOMESTIC_SITES = [
   {
     name: "卓球 Tリーグ",
     nameEn: "T.LEAGUE",
@@ -60,6 +51,7 @@ const DOMESTIC_SITES = [
     accentColor: "#0047AB",
     bgColor: "#EFF6FF",
     tag: "プロリーグ",
+    type: "site",
   },
   {
     name: "沖縄県卓球協会",
@@ -70,196 +62,204 @@ const DOMESTIC_SITES = [
     accentColor: "#00897B",
     bgColor: "#E8F5E9",
     tag: "沖縄",
-  },
-];
-
-// カテゴリ③：障害者卓球関連
-const PARA_SITES = [
-  {
-    name: "沖縄県障害者卓球協会",
-    nameEn: "Okinawa Disability Table Tennis Association",
-    description: "沖縄県内の障害者卓球を統括。沖縄県総合福祉センター内に事務局。大会情報を発信",
-    url: "https://akaihane-okinawa.jp/node/123",
-    emoji: "♿",
-    accentColor: "#0077B6",
-    bgColor: "#E0F4FF",
-    tag: "沖縄障害",
+    type: "site",
   },
   {
-    name: "パラ卓球協会（日本肢体不自由者卓球協会）",
-    nameEn: "Japan Para Table Tennis Association",
-    description: "肢体に障害を持つ選手の卓球競技団体。パラ卓球の普及・大会情報を発信",
-    url: "https://jptta.or.jp/",
-    emoji: "🏃",
-    accentColor: "#6A0DAD",
-    bgColor: "#F5EEFF",
-    tag: "パラ卓球",
+    name: "卓球TV (JTTA公式)",
+    handle: "@tabletennis",
+    description: "日本卓球協会公式動画配信。全日本選手権・代表戦のライブ配信を実施",
+    subscribers: "公式配信",
+    url: "https://www.youtube.com/@tabletennis",
+    emoji: "📺",
+    accentColor: "#BC002D",
+    bgColor: "#FFF5F5",
+    type: "youtube",
   },
   {
-    name: "日本知的障がい者卓球連盟",
-    nameEn: "Japan Table Tennis Federation for Intellectual Disabilities",
-    description: "知的障がいのある選手の卓球全国組織。JTTA・日本パラリンピック委員会に加盟",
-    url: "https://jttf-fid.org/",
-    emoji: "🧠",
-    accentColor: "#2E7D32",
-    bgColor: "#F1F8E9",
-    tag: "知的障害",
-  },
-  {
-    name: "日本視覚障害者卓球連盟（JATVI）",
-    nameEn: "Japan Table Tennis Federation for the Visually Impaired",
-    description: "視覚障害者の卓球（サウンドテーブルテニス）を普及する全国組織。大会情報を発信",
-    url: "https://jatvi.com/",
-    emoji: "👁️",
-    accentColor: "#37474F",
-    bgColor: "#ECEFF1",
-    tag: "視覚障害",
-  },
-  {
-    name: "日本パラスポーツ協会（JPSA）",
-    nameEn: "Japan Para-Sports Association",
-    description: "全障スポ（全国障害者スポーツ大会）の主催団体。卓球を含む障害者スポーツ全般を統括",
-    url: "https://www.parasports.or.jp/",
-    emoji: "🌟",
-    accentColor: "#E65100",
-    bgColor: "#FFF3E0",
-    tag: "全障スポ主催",
-  },
-];
-
-// ─── YouTubeチャンネル ─────────────────────────────────────────
-
-// カテゴリ④：世界の卓球YouTube（登録者数順）
-const WORLD_YT_CHANNELS = [
-  {
-    name: "Pongfinity",
-    handle: "@pongfinity",
-    description: "世界最大の卓球エンタメチャンネル。トリック動画が大人気",
-    subscribers: "470万人",
-    url: "https://www.youtube.com/@pongfinity",
+    name: "T.LEAGUE 公式",
+    handle: "@tleague",
+    description: "Tリーグ公式YouTube。フルマッチ・ハイライト・試合ライブ配信",
+    subscribers: "7.4万人",
+    url: "https://www.youtube.com/@tleague",
     emoji: "🎬",
-    accentColor: "#FF6B35",
-    bgColor: "#FFF4EE",
+    accentColor: "#0047AB",
+    bgColor: "#EFF6FF",
+    type: "youtube",
+  },
+];
+
+// 2. 世界の卓球サイト・チャンネル (国・地域別)
+const WORLD_LINKS: LinkItem[] = [
+  {
+    name: "中国卓球協会 (CTTA)",
+    nameEn: "Chinese Table Tennis Association",
+    description: "世界最強・中国卓球の総本山。代表選手情報・大会結果・最新ニュース",
+    url: "https://www.ctta.cn/",
+    emoji: "🇨🇳",
+    accentColor: "#C8102E",
+    bgColor: "#FFF0F0",
+    tag: "中国 🥇",
+    type: "site",
+  },
+  {
+    name: "韓国卓球協会 (KTTA)",
+    nameEn: "Korea Table Tennis Association",
+    description: "アジア屈指の強豪・韓国卓球の公式サイト。代表選手・大会情報を掲載",
+    url: "https://www.koreatta.or.kr/",
+    emoji: "🇰🇷",
+    accentColor: "#003478",
+    bgColor: "#EFF4FF",
+    tag: "韓国 🥉",
+    type: "site",
+  },
+  {
+    name: "KTTATV 대한탁구협회",
+    handle: "@kttatv",
+    description: "韓国卓球協会公式YouTube。国内大会・代表選手の試合動画を多数配信",
+    subscribers: "1.5万人",
+    url: "https://www.youtube.com/@kttatv",
+    emoji: "🇰🇷",
+    accentColor: "#003478",
+    bgColor: "#EFF4FF",
+    type: "youtube",
   },
   {
     name: "World Table Tennis",
     handle: "@wttglobal",
-    description: "世界大会のフルマッチ・ハイライトを配信する公式チャンネル",
+    description: "WTT公式。世界大会のフルマッチ・ハイライトを世界中に配信",
     subscribers: "135万人",
     url: "https://www.youtube.com/@wttglobal",
     emoji: "🏆",
     accentColor: "#E53E3E",
     bgColor: "#FFF5F5",
-  },
-  {
-    name: "TableTennisDaily",
-    handle: "@tabletennisdaily",
-    description: "プロ選手インタビュー・技術解説・試合動画が充実",
-    subscribers: "51万人",
-    url: "https://www.youtube.com/@tabletennisdaily",
-    emoji: "📺",
-    accentColor: "#2B6CB0",
-    bgColor: "#EBF8FF",
+    type: "youtube",
   },
   {
     name: "ITTF World",
     handle: "@ITTFWorld",
-    description: "国際卓球連盟の公式チャンネル。パラ卓球・歴史的名勝負も収録",
+    description: "国際卓球連盟公式。歴史的名勝負やパラ卓球の動画も豊富",
     subscribers: "13万人",
     url: "https://www.youtube.com/@ITTFWorld",
     emoji: "🌍",
     accentColor: "#276749",
     bgColor: "#F0FFF4",
+    type: "youtube",
   },
   {
     name: "ETTU OFFICIAL",
     handle: "@ettutvofficial",
-    description: "ヨーロッパ卓球連合公式。欧州選手権・チャンピオンズリーグを配信",
+    description: "ヨーロッパ卓球連合公式。欧州選手権やチャンピオンズリーグを配信",
     subscribers: "3.7万人",
     url: "https://www.youtube.com/@ettutvofficial",
     emoji: "🇪🇺",
     accentColor: "#553C9A",
     bgColor: "#FAF5FF",
-  },
-  {
-    name: "KTTATV 대한탁구협회",
-    handle: "@kttatv",
-    description: "韓国卓球協会の公式チャンネル。国内大会・代表選手の試合動画5,400本以上",
-    subscribers: "1.56万人",
-    url: "https://www.youtube.com/@kttatv",
-    emoji: "🇰🇷",
-    accentColor: "#003478",
-    bgColor: "#EFF4FF",
+    type: "youtube",
   },
   {
     name: "USA Table Tennis",
     handle: "@usatabletennis",
-    description: "全米卓球協会（USATT）公式。全米選手権・代表選手・大会ハイライトを配信",
+    description: "全米卓球協会公式YouTube。全米選手権や代表選手の活動を配信",
     subscribers: "2.1万人",
     url: "https://www.youtube.com/@usatabletennis",
     emoji: "🇺🇸",
     accentColor: "#B22234",
     bgColor: "#FFF5F5",
+    type: "youtube",
   },
   {
     name: "Table Tennis Canada",
     handle: "@TableTennisCanada",
-    description: "カナダ卓球協会（TTCAN）公式。カナダ代表選手・国内大会・育成動画を配信",
-    subscribers: "1,380人",
+    description: "カナダ卓球協会公式YouTube。代表選手や国内大会の様子を配信",
+    subscribers: "1,300人",
     url: "https://www.youtube.com/c/TableTennisCanadaTennisdeTable",
     emoji: "🇨🇦",
     accentColor: "#FF0000",
     bgColor: "#FFF8F8",
+    type: "youtube",
+  },
+  {
+    name: "Pongfinity",
+    handle: "@pongfinity",
+    description: "フィンランド発・世界最大のエンタメ卓球チャンネル。トリック動画が人気",
+    subscribers: "470万人",
+    url: "https://www.youtube.com/@pongfinity",
+    emoji: "🎬",
+    accentColor: "#FF6B35",
+    bgColor: "#FFF4EE",
+    type: "youtube",
+  },
+  {
+    name: "TableTennisDaily",
+    handle: "@tabletennisdaily",
+    description: "英国発。プロ選手インタビューや詳細な技術解説動画が充実",
+    subscribers: "51万人",
+    url: "https://www.youtube.com/@tabletennisdaily",
+    emoji: "📺",
+    accentColor: "#2B6CB0",
+    bgColor: "#EBF8FF",
+    type: "youtube",
   },
 ];
 
-// カテゴリ⑤：日本の卓球YouTube
-const JAPAN_YT_CHANNELS = [
+// 3. 専門・障害者卓球関連 (広告・まとめサイト的役割)
+const SPECIALIZED_LINKS: LinkItem[] = [
   {
-    name: "T.LEAGUE",
-    handle: "@tleague",
-    description: "卓球Tリーグ公式チャンネル。フルマッチ・ハイライト・試合ライブ配信を実施",
-    subscribers: "7.45万人",
-    url: "https://www.youtube.com/@tleague",
-    emoji: "🏅",
-    accentColor: "#0047AB",
-    bgColor: "#EFF6FF",
+    name: "沖縄県障害者卓球協会",
+    nameEn: "Okinawa Disability Table Tennis Association",
+    description: "沖縄県内の障害者卓球を統括。大会情報や活動内容を発信",
+    url: "https://akaihane-okinawa.jp/node/123",
+    emoji: "♿",
+    accentColor: "#0077B6",
+    bgColor: "#E0F4FF",
+    tag: "沖縄障害",
+    type: "site",
   },
   {
-    name: "卓球TV（JTTA公式）",
-    handle: "@tabletennis",
-    description: "日本卓球協会公式動画配信サイト。全日本選手権・代表戦・大会ライブ配信",
-    subscribers: "JTTA公式",
-    url: "https://www.youtube.com/@tabletennis",
-    emoji: "🇯🇵",
-    accentColor: "#BC002D",
-    bgColor: "#FFF5F5",
+    name: "パラ卓球協会 (肢体不自由者)",
+    nameEn: "Japan Para Table Tennis Association",
+    description: "肢体不自由選手の公式団体。パラ卓球の普及と大会運営を実施",
+    url: "https://jptta.or.jp/",
+    emoji: "🏃",
+    accentColor: "#6A0DAD",
+    bgColor: "#F5EEFF",
+    tag: "パラ卓球",
+    type: "site",
+  },
+  {
+    name: "日本知的障がい者卓球連盟",
+    nameEn: "Japan Table Tennis Federation for ID",
+    description: "知的障がい選手の全国組織。世界大会への派遣や国内大会を運営",
+    url: "https://jttf-fid.org/",
+    emoji: "🧠",
+    accentColor: "#2E7D32",
+    bgColor: "#F1F8E9",
+    tag: "知的障害",
+    type: "site",
+  },
+  {
+    name: "日本視覚障害者卓球連盟",
+    nameEn: "Japan Table Tennis Federation for VI",
+    description: "視覚障害者卓球(STT)の全国組織。サウンドテーブルテニスを普及",
+    url: "https://jatvi.com/",
+    emoji: "👁️",
+    accentColor: "#37474F",
+    bgColor: "#ECEFF1",
+    tag: "視覚障害",
+    type: "site",
+  },
+  {
+    name: "日本パラスポーツ協会 (JPSA)",
+    nameEn: "Japan Para-Sports Association",
+    description: "全障スポ(全国障害者スポーツ大会)主催。障害者スポーツ全般を統括",
+    url: "https://www.parasports.or.jp/",
+    emoji: "🌟",
+    accentColor: "#E65100",
+    bgColor: "#FFF3E0",
+    tag: "全障スポ",
+    type: "site",
   },
 ];
-
-// ─── 共通カードコンポーネント用ヘルパー ────────────────────────
-
-type SiteItem = {
-  name: string;
-  nameEn: string;
-  description: string;
-  url: string;
-  emoji: string;
-  accentColor: string;
-  bgColor: string;
-  tag: string;
-};
-
-type ChannelItem = {
-  name: string;
-  handle: string;
-  description: string;
-  subscribers: string;
-  url: string;
-  emoji: string;
-  accentColor: string;
-  bgColor: string;
-};
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -285,66 +285,39 @@ export default function HomeScreen() {
     Linking.openURL(url);
   };
 
-  const renderSiteCard = (site: SiteItem) => (
+  const renderLinkCard = (item: LinkItem) => (
     <TouchableOpacity
-      key={site.url}
-      onPress={() => handleLinkPress(site.url)}
-      style={{ backgroundColor: site.bgColor, borderLeftColor: site.accentColor }}
+      key={item.url}
+      onPress={() => handleLinkPress(item.url)}
+      style={{ backgroundColor: item.bgColor, borderLeftColor: item.accentColor }}
       className="rounded-xl p-4 border-l-4 mb-3 active:opacity-75"
     >
       <View className="flex-row items-start justify-between">
         <View className="flex-1">
           <View className="flex-row items-center mb-1">
-            <Text className="text-xl mr-2">{site.emoji}</Text>
-            <Text className="text-base font-bold flex-1" style={{ color: site.accentColor }}>
-              {site.name}
+            <Text className="text-xl mr-2">{item.emoji}</Text>
+            <Text className="text-base font-bold flex-1" style={{ color: item.accentColor }}>
+              {item.name}
             </Text>
           </View>
-          <Text className="text-xs text-muted mb-1">{site.nameEn}</Text>
-          <Text className="text-sm text-foreground leading-relaxed">{site.description}</Text>
+          {item.handle ? (
+            <Text className="text-xs text-muted mb-1">{item.handle}</Text>
+          ) : item.nameEn ? (
+            <Text className="text-xs text-muted mb-1">{item.nameEn}</Text>
+          ) : null}
+          <Text className="text-sm text-foreground leading-relaxed">{item.description}</Text>
         </View>
         <View className="ml-3 items-end">
-          <View
-            style={{ backgroundColor: site.accentColor + "20" }}
-            className="rounded-full px-2 py-1 mb-1"
-          >
-            <Text className="text-xs font-bold" style={{ color: site.accentColor }}>
-              {site.tag}
-            </Text>
-          </View>
-          <Text className="text-lg">→</Text>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-
-  const renderChannelCard = (channel: ChannelItem) => (
-    <TouchableOpacity
-      key={channel.handle}
-      onPress={() => handleLinkPress(channel.url)}
-      style={{ backgroundColor: channel.bgColor, borderLeftColor: channel.accentColor }}
-      className="rounded-xl p-4 border-l-4 mb-3 active:opacity-75"
-    >
-      <View className="flex-row items-start justify-between">
-        <View className="flex-1">
-          <View className="flex-row items-center mb-1">
-            <Text className="text-xl mr-2">{channel.emoji}</Text>
-            <Text className="text-base font-bold" style={{ color: channel.accentColor }}>
-              {channel.name}
-            </Text>
-          </View>
-          <Text className="text-xs text-muted mb-1">{channel.handle}</Text>
-          <Text className="text-sm text-foreground leading-relaxed">{channel.description}</Text>
-        </View>
-        <View className="ml-3 items-end">
-          <View
-            style={{ backgroundColor: channel.accentColor + "20" }}
-            className="rounded-full px-2 py-1 mb-1"
-          >
-            <Text className="text-xs font-bold" style={{ color: channel.accentColor }}>
-              {channel.subscribers}
-            </Text>
-          </View>
+          {(item.tag || item.subscribers) && (
+            <View
+              style={{ backgroundColor: item.accentColor + "20" }}
+              className="rounded-full px-2 py-1 mb-1"
+            >
+              <Text className="text-xs font-bold" style={{ color: item.accentColor }}>
+                {item.tag || item.subscribers}
+              </Text>
+            </View>
+          )}
           <Text className="text-lg">→</Text>
         </View>
       </View>
@@ -452,34 +425,22 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* ① 世界の卓球協会サイト */}
+          {/* ① 日本の卓球協会・国内サイト */}
           <View className="mt-2">
-            {renderSectionHeader("🌐", "世界の卓球協会", "強豪国の公式サイト（強い順）")}
-            {WORLD_ASSOC_SITES.map(renderSiteCard)}
+            {renderSectionHeader("🇯🇵", "日本の卓球サイト", "日本卓球協会・Tリーグ・地域協会の公式情報")}
+            {JAPAN_LINKS.map(renderLinkCard)}
           </View>
 
-          {/* ② 国内リーグ・地域協会 */}
+          {/* ② 世界の卓球サイト (国・地域別) */}
           <View className="mt-2">
-            {renderSectionHeader("🏅", "国内リーグ・地域協会", "Tリーグ・沖縄県卓球協会の公式サイト")}
-            {DOMESTIC_SITES.map(renderSiteCard)}
+            {renderSectionHeader("🌐", "世界の卓球サイト", "中国・韓国・欧米・国際連盟の最新情報をチェック")}
+            {WORLD_LINKS.map(renderLinkCard)}
           </View>
 
-          {/* ③ 障害者卓球関連サイト */}
+          {/* ③ 専門・障害者卓球関連 */}
           <View className="mt-2">
-            {renderSectionHeader("♿", "障害者卓球関連サイト", "パラ卓球・全障スポ・沖縄障害者卓球の公式サイト")}
-            {PARA_SITES.map(renderSiteCard)}
-          </View>
-
-          {/* ④ 世界の卓球YouTubeチャンネル */}
-          <View className="mt-2">
-            {renderSectionHeader("▶️", "世界の卓球YouTube", "登録者数の多い世界トップチャンネル（8チャンネル）")}
-            {WORLD_YT_CHANNELS.map(renderChannelCard)}
-          </View>
-
-          {/* ⑤ 日本の卓球YouTubeチャンネル */}
-          <View className="mt-2">
-            {renderSectionHeader("🇯🇵", "日本の卓球YouTube", "JTTA公式・Tリーグ公式チャンネル")}
-            {JAPAN_YT_CHANNELS.map(renderChannelCard)}
+            {renderSectionHeader("♿", "専門・障害者卓球関連", "パラ卓球・全障スポ・各障害者卓球連盟の公式サイト")}
+            {SPECIALIZED_LINKS.map(renderLinkCard)}
           </View>
 
           {/* プレミアムバナー */}
