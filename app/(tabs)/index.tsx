@@ -13,8 +13,6 @@ const resourceColors = [
   { bg: "#FFE8D6", border: "#FF6B35", icon: "🌟" },
 ];
 
-// ─── カテゴリ別データ定義 ──────────────────────────────────────────
-
 type LinkItem = {
   name: string;
   nameEn?: string;
@@ -202,7 +200,7 @@ const WORLD_LINKS: LinkItem[] = [
   },
 ];
 
-// 3. 専門・障害者卓球関連 (広告・まとめサイト的役割)
+// 3. 専門・障害者卓球関連
 const SPECIALIZED_LINKS: LinkItem[] = [
   {
     name: "沖縄県障害者卓球協会",
@@ -290,65 +288,82 @@ export default function HomeScreen() {
       key={item.url}
       onPress={() => handleLinkPress(item.url)}
       style={{ backgroundColor: item.bgColor, borderLeftColor: item.accentColor }}
-      className="rounded-xl p-4 border-l-4 mb-3 active:opacity-75"
+      className="rounded-lg p-4 border-l-4 mb-3 shadow-sm active:opacity-75"
     >
       <View className="flex-row items-start justify-between">
         <View className="flex-1">
-          <View className="flex-row items-center mb-1">
-            <Text className="text-xl mr-2">{item.emoji}</Text>
+          <View className="flex-row items-center mb-2">
+            <Text className="text-2xl mr-2">{item.emoji}</Text>
             <Text className="text-base font-bold flex-1" style={{ color: item.accentColor }}>
               {item.name}
             </Text>
           </View>
           {item.handle ? (
-            <Text className="text-xs text-muted mb-1">{item.handle}</Text>
+            <Text className="text-xs text-gray-500 mb-2 font-medium">{item.handle}</Text>
           ) : item.nameEn ? (
-            <Text className="text-xs text-muted mb-1">{item.nameEn}</Text>
+            <Text className="text-xs text-gray-500 mb-2 font-medium">{item.nameEn}</Text>
           ) : null}
-          <Text className="text-sm text-foreground leading-relaxed">{item.description}</Text>
+          <Text className="text-sm text-gray-700 leading-relaxed">{item.description}</Text>
         </View>
-        <View className="ml-3 items-end">
+        <View className="ml-3 items-end justify-start">
           {(item.tag || item.subscribers) && (
             <View
-              style={{ backgroundColor: item.accentColor + "20" }}
-              className="rounded-full px-2 py-1 mb-1"
+              style={{ backgroundColor: item.accentColor + "25" }}
+              className="rounded-full px-3 py-1 mb-2"
             >
               <Text className="text-xs font-bold" style={{ color: item.accentColor }}>
                 {item.tag || item.subscribers}
               </Text>
             </View>
           )}
-          <Text className="text-lg">→</Text>
+          <Text className="text-xl font-bold" style={{ color: item.accentColor }}>
+            →
+          </Text>
         </View>
       </View>
     </TouchableOpacity>
   );
 
   const renderSectionHeader = (emoji: string, title: string, subtitle: string) => (
-    <View className="mb-3">
-      <View className="flex-row items-center mb-1">
-        <Text className="text-2xl mr-2">{emoji}</Text>
-        <Text className="text-lg font-bold text-foreground">{title}</Text>
+    <View className="mb-4 mt-2">
+      <View className="flex-row items-center mb-2">
+        <Text className="text-3xl mr-3">{emoji}</Text>
+        <View className="flex-1">
+          <Text className="text-xl font-bold text-gray-900">{title}</Text>
+          <Text className="text-xs text-gray-600 mt-1">{subtitle}</Text>
+        </View>
       </View>
-      <Text className="text-xs text-muted">{subtitle}</Text>
+      <View style={{ height: 3, backgroundColor: "#F97316", marginTop: 8, width: "42%" }} />
     </View>
   );
 
   return (
-    <ScreenContainer className="p-0 flex-1">
+    <ScreenContainer className="p-0 flex-1 bg-white">
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-        {/* ヘッダー */}
-        <View className="bg-gradient-to-b from-orange-400 to-orange-300 px-4 pt-8 pb-6">
-          <Text className="text-4xl font-bold text-white mb-2">Ping Pong Master</Text>
-          <Text className="text-white text-base opacity-90">
-            卓球技術を学んでスキルアップしよう
-          </Text>
+        {/* 卓球テーマのヘッダー */}
+        <View style={{ backgroundColor: "#E94F1D", paddingHorizontal: 24, paddingTop: 40, paddingBottom: 32, position: "relative", overflow: "hidden" }}>
+          {/* 背景装飾 */}
+          <View style={{ position: "absolute", top: -32, right: -32, width: 128, height: 128, backgroundColor: "#FFFFFF", opacity: 0.12, borderRadius: 64 }} />
+          <View style={{ position: "absolute", bottom: -24, left: -24, width: 96, height: 96, backgroundColor: "#FFFFFF", opacity: 0.12, borderRadius: 48 }} />
+          
+          {/* ヘッダーコンテンツ */}
+          <View style={{ position: "relative", zIndex: 10 }}>
+            <View className="flex-row items-center justify-between mb-3">
+              <Text className="text-5xl font-black text-white">🏓</Text>
+              <Text className="text-sm font-bold text-white opacity-90">Ping Pong Master</Text>
+            </View>
+            <Text className="text-3xl font-black text-white mb-2">卓球マスター</Text>
+            <Text className="text-white text-base opacity-95 leading-relaxed">
+              世界と日本の卓球情報を一つに。
+              {"\n"}公式サイト・大会情報・プロ動画をチェック
+            </Text>
+          </View>
         </View>
 
-        <View className="gap-4 p-4 pb-6">
+        <View className="gap-4 p-6 pb-8">
           {/* 技術カテゴリ */}
           <View className="mb-2">
-            <Text className="text-lg font-bold text-foreground mb-3">基本技術</Text>
+            <Text className="text-lg font-bold text-gray-900 mb-4">基本技術を学ぶ</Text>
             <View className="gap-3">
               {CATEGORIES.map((category, index) => {
                 const colors = ["#FF6B35", "#004E89", "#F77F00", "#06A77D", "#D62828"];
@@ -358,10 +373,10 @@ export default function HomeScreen() {
                     key={category.id}
                     onPress={() => handleCategoryPress(category.id)}
                     style={{ backgroundColor: bgColor + "15", borderLeftColor: bgColor }}
-                    className="rounded-xl p-4 border-l-4 active:opacity-75"
+                    className="rounded-lg p-4 border-l-4 active:opacity-75 shadow-sm"
                   >
                     <View className="flex-row items-center justify-between">
-                      <Text className="text-lg font-bold text-foreground flex-1">
+                      <Text className="text-lg font-bold text-gray-900 flex-1">
                         {category.name}
                       </Text>
                       <Text className="text-2xl">→</Text>
@@ -373,89 +388,89 @@ export default function HomeScreen() {
           </View>
 
           {/* 学習リソース */}
-          <View className="mt-2">
-            <Text className="text-lg font-bold text-foreground mb-3">学習リソース</Text>
+          <View className="mt-4">
+            <Text className="text-lg font-bold text-gray-900 mb-4">学習リソース</Text>
             <TouchableOpacity
               onPress={() => router.push("/glossary-expanded")}
               style={{ backgroundColor: resourceColors[0].bg, borderLeftColor: resourceColors[0].border }}
-              className="rounded-xl p-4 border-l-4 mb-3 active:opacity-75"
+              className="rounded-lg p-4 border-l-4 mb-3 active:opacity-75 shadow-sm"
             >
               <View className="flex-row items-center justify-between mb-2">
-                <Text className="text-2xl">{resourceColors[0].icon}</Text>
-                <Text className="text-sm text-foreground">→</Text>
+                <Text className="text-3xl">{resourceColors[0].icon}</Text>
+                <Text className="text-sm text-gray-600">→</Text>
               </View>
-              <Text className="text-lg font-bold text-foreground mb-1">用語辞典（127個）</Text>
-              <Text className="text-sm text-muted">ルール・道具・技術・戦術など全て</Text>
+              <Text className="text-lg font-bold text-gray-900 mb-1">用語辞典（127個）</Text>
+              <Text className="text-sm text-gray-600">ルール・道具・技術・戦術など全て</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => router.push("/core-training")}
               style={{ backgroundColor: resourceColors[1].bg, borderLeftColor: resourceColors[1].border }}
-              className="rounded-xl p-4 border-l-4 mb-3 active:opacity-75"
+              className="rounded-lg p-4 border-l-4 mb-3 active:opacity-75 shadow-sm"
             >
               <View className="flex-row items-center justify-between mb-2">
-                <Text className="text-2xl">{resourceColors[1].icon}</Text>
-                <Text className="text-sm text-foreground">→</Text>
+                <Text className="text-3xl">{resourceColors[1].icon}</Text>
+                <Text className="text-sm text-gray-600">→</Text>
               </View>
-              <Text className="text-lg font-bold text-foreground mb-1">体幹トレーニング</Text>
-              <Text className="text-sm text-muted">体を鍛えてパフォーマンスアップ</Text>
+              <Text className="text-lg font-bold text-gray-900 mb-1">体幹トレーニング</Text>
+              <Text className="text-sm text-gray-600">体を鍛えてパフォーマンスアップ</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => router.push("/training")}
               style={{ backgroundColor: resourceColors[2].bg, borderLeftColor: resourceColors[2].border }}
-              className="rounded-xl p-4 border-l-4 mb-3 active:opacity-75"
+              className="rounded-lg p-4 border-l-4 mb-3 active:opacity-75 shadow-sm"
             >
               <View className="flex-row items-center justify-between mb-2">
-                <Text className="text-2xl">{resourceColors[2].icon}</Text>
-                <Text className="text-sm text-foreground">→</Text>
+                <Text className="text-3xl">{resourceColors[2].icon}</Text>
+                <Text className="text-sm text-gray-600">→</Text>
               </View>
-              <Text className="text-lg font-bold text-foreground mb-1">練習メニュー</Text>
-              <Text className="text-sm text-muted">レベル別の練習方法を学ぶ</Text>
+              <Text className="text-lg font-bold text-gray-900 mb-1">練習メニュー</Text>
+              <Text className="text-sm text-gray-600">レベル別の練習方法を学ぶ</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => router.push("/pro-players")}
               style={{ backgroundColor: resourceColors[3].bg, borderLeftColor: resourceColors[3].border }}
-              className="rounded-xl p-4 border-l-4 active:opacity-75"
+              className="rounded-lg p-4 border-l-4 active:opacity-75 shadow-sm"
             >
               <View className="flex-row items-center justify-between mb-2">
-                <Text className="text-2xl">{resourceColors[3].icon}</Text>
-                <Text className="text-sm text-foreground">→</Text>
+                <Text className="text-3xl">{resourceColors[3].icon}</Text>
+                <Text className="text-sm text-gray-600">→</Text>
               </View>
-              <Text className="text-lg font-bold text-foreground mb-1">プロ選手</Text>
-              <Text className="text-sm text-muted">世界トップ選手の戦術を学ぶ</Text>
+              <Text className="text-lg font-bold text-gray-900 mb-1">プロ選手</Text>
+              <Text className="text-sm text-gray-600">世界トップ選手の戦術を学ぶ</Text>
             </TouchableOpacity>
           </View>
 
           {/* ① 日本の卓球協会・国内サイト */}
-          <View className="mt-2">
-            {renderSectionHeader("🇯🇵", "日本の卓球サイト", "日本卓球協会・Tリーグ・地域協会の公式情報")}
+          <View className="mt-6">
+            {renderSectionHeader("🇯🇵", "日本の卓球情報", "JTTA・Tリーグ・地域協会の最新情報")}
             {JAPAN_LINKS.map(renderLinkCard)}
           </View>
 
           {/* ② 世界の卓球サイト (国・地域別) */}
-          <View className="mt-2">
-            {renderSectionHeader("🌐", "世界の卓球サイト", "中国・韓国・欧米・国際連盟の最新情報をチェック")}
+          <View className="mt-6">
+            {renderSectionHeader("🌐", "世界の卓球情報", "中国・韓国・欧米・国際連盟の動画・ニュース")}
             {WORLD_LINKS.map(renderLinkCard)}
           </View>
 
           {/* ③ 専門・障害者卓球関連 */}
-          <View className="mt-2">
-            {renderSectionHeader("♿", "専門・障害者卓球関連", "パラ卓球・全障スポ・各障害者卓球連盟の公式サイト")}
+          <View className="mt-6">
+            {renderSectionHeader("♿", "専門・障害者卓球", "パラ卓球・全障スポ・各障害者卓球連盟")}
             {SPECIALIZED_LINKS.map(renderLinkCard)}
           </View>
 
           {/* プレミアムバナー */}
           {!isPremium && (
-            <View className="bg-gradient-to-r from-orange-100 to-orange-50 rounded-xl p-4 border border-orange-300 mt-4">
-              <Text className="text-base font-bold text-foreground mb-2">🎁 プレミアムを試す</Text>
-              <Text className="text-sm text-foreground leading-relaxed mb-3">
+            <View className="bg-gradient-to-r from-orange-100 to-orange-50 rounded-lg p-5 border border-orange-300 mt-6 shadow-sm">
+              <Text className="text-base font-bold text-gray-900 mb-2">🎁 プレミアムを試す</Text>
+              <Text className="text-sm text-gray-700 leading-relaxed mb-4">
                 7日間無料で、すべてのコンテンツにアクセスできます。
               </Text>
               <TouchableOpacity
                 onPress={() => router.push('/premium')}
                 style={{ backgroundColor: '#FF6B35' }}
-                className="rounded-lg py-2 px-4"
+                className="rounded-lg py-3 px-4 shadow-md"
               >
-                <Text className="text-white font-bold text-center">
+                <Text className="text-white font-bold text-center text-base">
                   7日間無料トライアルを開始
                 </Text>
               </TouchableOpacity>
@@ -463,9 +478,9 @@ export default function HomeScreen() {
           )}
 
           {/* 情報セクション */}
-          <View className="bg-gradient-to-r from-blue-100 to-blue-50 rounded-xl p-4 border border-blue-200 mt-4">
-            <Text className="text-base font-bold text-foreground mb-2">🏓 このアプリについて</Text>
-            <Text className="text-sm text-foreground leading-relaxed">
+          <View className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-5 border border-blue-200 mt-6 shadow-sm">
+            <Text className="text-base font-bold text-gray-900 mb-2">🏓 このアプリについて</Text>
+            <Text className="text-sm text-gray-700 leading-relaxed">
               Ping Pong Masterは、卓球の技術を学ぶための総合学習アプリです。基本技術から応用技術まで、プロ選手の例を交えて詳しく解説しています。
             </Text>
           </View>
