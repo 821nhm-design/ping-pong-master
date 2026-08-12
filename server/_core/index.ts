@@ -6,6 +6,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
+import stripeRouter from "../routes/stripe";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise((resolve) => {
@@ -51,10 +52,13 @@ async function startServer() {
     next();
   });
 
+  // Stripe Webhookは署名検証のため、生のリクエストボディを先に受け取る
+  app.use("/api/stripe/webhook", express.raw({ type: "application/json" }));
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
   registerOAuthRoutes(app);
+  app.use("/api/stripe", stripeRouter);
 
   app.get("/api/health", (_req, res) => {
     res.json({ ok: true, timestamp: Date.now() });

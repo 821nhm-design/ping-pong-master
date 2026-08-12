@@ -343,10 +343,22 @@ export default function PremiumScreen() {
           </View>
         </View>
 
-        {/* フッター */}
+        {/* 法的情報・フッター */}
         <View className="px-4 py-8 border-t border-border">
+          <Text className="text-sm font-bold text-foreground mb-3">購入前にご確認ください</Text>
+          <View className="flex-row flex-wrap gap-x-4 gap-y-2 mb-4">
+            <Pressable onPress={() => router.push('/legal/commercial')}>
+              <Text className="text-sm text-primary underline">特商法表記</Text>
+            </Pressable>
+            <Pressable onPress={() => router.push('/legal/terms')}>
+              <Text className="text-sm text-primary underline">利用規約</Text>
+            </Pressable>
+            <Pressable onPress={() => router.push('/legal/privacy')}>
+              <Text className="text-sm text-primary underline">プライバシー</Text>
+            </Pressable>
+          </View>
           <Text className="text-xs text-muted text-center">
-            安全な決済システムを使用しています。ご不明な点はサポートまでお問い合わせください。
+            決済はStripeが処理します。価格、提供時期、返金条件は購入前に表示される内容と法的ページをご確認ください。
           </Text>
         </View>
       </ScrollView>

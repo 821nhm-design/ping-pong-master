@@ -35,17 +35,13 @@ router.post('/create-checkout-session', async (req: Request, res: Response) => {
       });
     }
 
-    // プラン情報を定義
-    const plans: Record<string, { name: string; amount: number; interval: 'month' | 'year' }> = {
-      monthly: {
-        name: 'Monthly Premium',
-        amount: 999, // $9.99
-        interval: 'month',
-      },
-      yearly: {
-        name: 'Yearly Premium',
-        amount: 9999, // $99.99
-        interval: 'year',
+    // 買い切りプラン。価格は販売前に必ず事業者の最終価格へ変更してください。
+    const plans: Record<string, { name: string; amount: number; currency: string; billingType: 'onetime' }> = {
+      pro: {
+        name: 'Ping Pong Master Pro',
+        amount: 1500,
+        currency: 'jpy',
+        billingType: 'onetime',
       },
     };
 
@@ -63,27 +59,24 @@ router.post('/create-checkout-session', async (req: Request, res: Response) => {
       line_items: [
         {
           price_data: {
-            currency: 'usd',
+            currency: plan.currency,
             product_data: {
               name: plan.name,
-              description: 'Ping Pong Master Premium Subscription',
+              description: 'Ping Pong Master Pro — one-time purchase',
             },
             unit_amount: plan.amount,
-            recurring: {
-              interval: plan.interval,
-              interval_count: 1,
-            },
           },
           quantity: 1,
         },
       ],
-      mode: 'subscription',
+      mode: 'payment',
       success_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/premium/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/premium/cancel`,
       customer_email: userEmail,
       metadata: {
         userId,
         planId,
+        billingType: plan.billingType,
       },
     });
 
@@ -106,6 +99,36 @@ router.post('/create-checkout-session', async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to create checkout session',
+    });
+  }
+});
+
+/**
+ * 決済完了画面用のサーバー検証
+ * GET /api/stripe/checkout-session/:sessionId
+ */
+router.get('/checkout-session/:sessionId', async (req: Request, res: Response) => {
+  try {
+    if (!stripe) {
+      return res.status(500).json({ success: false, error: 'Stripe is not configured' });
+    }
+
+    const session = await stripe.checkout.sessions.retrieve(req.params.sessionId);
+    const metadata = session.metadata ?? {};
+    const paid = session.payment_status === 'paid' && session.status === 'complete';
+
+    res.json({
+      success: true,
+      paid,
+      userId: metadata.userId ?? null,
+      planId: metadata.planId ?? null,
+      paymentStatus: session.payment_status,
+    });
+  } catch (error) {
+    console.error('Error verifying checkout session:', error);
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to verify checkout session',
     });
   }
 });
@@ -149,7 +172,8 @@ router.post('/webhook', async (req: Request, res: Response) => {
       }
     } else {
       // 署名検証なし（開発環境用）
-      event = JSON.parse(req.body);
+      const rawBody = Buffer.isBuffer(req.body) ? req.body.toString('utf8') : req.body;
+      event = typeof rawBody === 'string' ? JSON.parse(rawBody) : rawBody;
     }
 
     // イベント処理
