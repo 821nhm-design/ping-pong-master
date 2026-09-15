@@ -1,0 +1,504 @@
+```react
+import React, { useState, useEffect, useRef } from 'react';
+import { Play, Square, Volume2, VolumeX, MonitorPlay, Zap, Box, Trophy, Globe, Smile, Download, Video } from 'lucide-react';
+
+const TableTennisAutoAnimation = () => {
+  const [currentScene, setCurrentScene] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const synthRef = useRef(window.speechSynthesis);
+  const mediaRecorderRef = useRef(null);
+  const recordedChunksRef = useRef([]);
+
+  // 全10シーンのシナリオデータ
+  const scenes = [
+    {
+      id: 0,
+      title: "はじまり",
+      mainText: "卓球の歴史アドベンチャーへようこそ！",
+      visualType: "intro",
+      script: "こんにちは！今日はみんなで「卓球の歴史」を探検しよう。卓球はいつ、どこで生まれたのかな？実は意外な場所なんだよ。さあ、タイムトラベルに出発だ！"
+    },
+    {
+      id: 1,
+      title: "1880年代：イギリス",
+      mainText: "雨の日の退屈しのぎ？",
+      visualType: "rain",
+      script: "今から約140年前、イギリスでのこと。テニスが大好きな人たちがいました。でも外は雨。「あーあ、テニスしたいな」…そこで誰かがひらめいた！「食堂のテーブルでテニスをすればいいじゃないか！」これが卓球の始まりなんです。"
+    },
+    {
+      id: 2,
+      title: "道具のびっくり進化",
+      mainText: "ラケットは箱のフタ！？",
+      visualType: "tools",
+      script: "最初は道具なんてありません。なんと、高級なタバコが入っていた「木の箱のフタ」をラケットにして、ワインのフタ、コルクを丸めてボールにしていました。ネットの代わりには、分厚い本を並べていたんだって！びっくりだよね。"
+    },
+    {
+      id: 3,
+      title: "名前の由来",
+      mainText: "なんで「ピンポン」？",
+      visualType: "sound",
+      script: "昔は「ゴシマ」とか「ウィフ・ワフ」なんて変な名前で呼ばれていました。でもある時、中が空洞のボールが発明されました。打つと「ピン！」台につくと「ポン！」と音がする。そこから「ピンポン」と呼ばれるようになったんだよ。"
+    },
+    {
+      id: 4,
+      title: "1950年代：日本の大発明",
+      mainText: "日本が世界を変えた！",
+      visualType: "japan",
+      script: "それから少し時間が経って1950年代。日本人がすごい発明をしました。ラケットに「スポンジ」を貼ったのです。すると…ボールがものすごく速くなって、ギュンギュン回転がかかるようになりました！これで卓球がさらに面白いスポーツに進化したんだ。"
+    },
+    {
+      id: 5,
+      title: "ラバーの色",
+      mainText: "なぜ赤と黒なの？",
+      visualType: "colors",
+      script: "卓球のラケットのゴムって、赤と黒だよね？なんでか知ってる？昔は両面同じ色でも良かったんだけど、片方はスピンがかかるゴム、もう片方は滑るゴムを貼って、相手を騙す選手が出てきたんだ。だからルールで「両面違う色の、赤と黒にしなさい！」と決まったんだよ。"
+    },
+    {
+      id: 6,
+      title: "ボールの進化",
+      mainText: "ボールが大きくなった！？",
+      visualType: "ball_size",
+      script: "昔の卓球のボールは、今より少しだけ小さかったんだ。でも、選手の打つボールが速すぎて、テレビで見ている人たちから「速すぎてボールが見えない！」って言われちゃった。だから、少しだけ大きくして、ラリーが長く続くようにしたんだよ。最近はプラスチックになって進化しているんだ。"
+    },
+    {
+      id: 7,
+      title: "オリンピック競技へ",
+      mainText: "世界中の人気スポーツに",
+      visualType: "olympic",
+      script: "そして1988年、ついに卓球はオリンピックの正式なスポーツになりました。今では世界中の人が熱狂する、スピードと頭脳のスポーツになったんだね。"
+    },
+    {
+      id: 8,
+      title: "クイズ！",
+      mainText: "おさらいクイズ",
+      visualType: "quiz",
+      script: "さあ、ここでおさらいクイズ！卓球が始まったばかりの頃、ラケットとして使われていたのは何だったでしょう？ 1番：フライパン、2番：スリッパ、3番：箱のフタ。……正解は、3番の「箱のフタ」でした！"
+    },
+    {
+      id: 9,
+      title: "まとめ",
+      mainText: "さあ、卓球を楽しもう！",
+      visualType: "ending",
+      script: "卓球の歴史、どうだったかな？雨の日の遊びから始まって、日本人の発明で進化して、今のオリンピック競技になったんだね。今日はみんなも、楽しみながらかっこいいプレーを見せてね！これで歴史のお話はおしまい！"
+    }
+  ];
+
+  // 音声読み上げと自動進行のロジック
+  const speakAndGoNext = (sceneIndex) => {
+    if (!synthRef.current) return;
+    synthRef.current.cancel(); // 進行中の音声をキャンセル
+
+    const text = scenes[sceneIndex].script;
+    const utterance = new SpeechSynthesisUtterance(text);
+    
+    // 音声の設定（日本語、少し高め・少し早めで子ども向けに）
+    utterance.lang = 'ja-JP';
+    utterance.pitch = 1.2;
+    utterance.rate = 1.1;
+
+    utterance.onstart = () => {
+      setIsSpeaking(true);
+    };
+
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      // 自動再生中で、かつ最後のシーンでなければ次へ進む
+      if (isAutoPlayingRef.current) {
+        if (sceneIndex < scenes.length - 1) {
+          // 少し間をあけて次のシーンへ
+          setTimeout(() => {
+            setCurrentScene(prev => {
+              const next = prev + 1;
+              speakAndGoNext(next);
+              return next;
+            });
+          }, 1000); // 1秒の間
+        } else {
+          // 最後まで終わったら自動再生終了
+          setIsAutoPlaying(false);
+          isAutoPlayingRef.current = false;
+          // 録画中なら録画も停止して保存処理へ
+          if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+            mediaRecorderRef.current.stop();
+          }
+        }
+      }
+    };
+
+    utterance.onerror = (e) => {
+      console.error("Speech error", e);
+      setIsSpeaking(false);
+    };
+
+    synthRef.current.speak(utterance);
+  };
+
+  // Stateの最新値をonendコールバック内で参照するためのRef
+  const isAutoPlayingRef = useRef(isAutoPlaying);
+  useEffect(() => {
+    isAutoPlayingRef.current = isAutoPlaying;
+  }, [isAutoPlaying]);
+
+  const toggleAutoPlay = () => {
+    if (isAutoPlaying) {
+      // 停止する
+      setIsAutoPlaying(false);
+      synthRef.current.cancel();
+      setIsSpeaking(false);
+      // 録画中なら録画も停止
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+        mediaRecorderRef.current.stop();
+      }
+    } else {
+      // 自動再生スタート
+      setCurrentScene(0);
+      setIsAutoPlaying(true);
+      // ブラウザの制限により、ユーザーアクション直後に呼び出す必要がある
+      setTimeout(() => {
+         speakAndGoNext(0);
+      }, 100);
+    }
+  };
+
+  // コンポーネント破棄時に音声を止める
+  useEffect(() => {
+    return () => {
+      if (synthRef.current) {
+        synthRef.current.cancel();
+      }
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+        mediaRecorderRef.current.stop();
+      }
+    };
+  }, []);
+
+  // ブラウザの録画機能を使って動画を作成・保存するロジック
+  const startRecordingAndPlay = async () => {
+    try {
+      // 画面共有と音声の取得（ユーザーに許可を求めるダイアログが出ます）
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        video: { displaySurface: "browser" },
+        audio: true // ※重要: これによりシステム（タブ）音声を取得します
+      });
+
+      // 録画データの保存先
+      recordedChunksRef.current = [];
+      const options = { mimeType: 'video/webm' };
+      let recorder;
+      try {
+        recorder = new MediaRecorder(stream, options);
+      } catch (e) {
+        // オプション非対応時のフォールバック
+        recorder = new MediaRecorder(stream);
+      }
+
+      mediaRecorderRef.current = recorder;
+
+      // データが生成されるたびにチャンクに追加
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          recordedChunksRef.current.push(e.data);
+        }
+      };
+
+      // 録画停止時（最後まで再生が終わった時）のファイル化とダウンロード処理
+      recorder.onstop = () => {
+        const blob = new Blob(recordedChunksRef.current, {
+          type: recorder.mimeType || 'video/webm'
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        document.body.appendChild(a);
+        a.style = 'display: none';
+        a.href = url;
+        a.download = 'TableTennisHistory.webm'; // WebM形式でダウンロード
+        a.click();
+        window.URL.revokeObjectURL(url);
+
+        // カメラ/マイクの使用（画面共有）を完全に停止
+        stream.getTracks().forEach(track => track.stop());
+        setIsRecording(false);
+        setIsAutoPlaying(false);
+        synthRef.current.cancel();
+      };
+
+      // 録画開始
+      recorder.start();
+      setIsRecording(true);
+
+      // 自動再生スタート（画面共有ダイアログが消えるのを少し待つ）
+      setCurrentScene(0);
+      setIsAutoPlaying(true);
+      setTimeout(() => {
+        speakAndGoNext(0);
+      }, 500);
+
+    } catch (err) {
+      console.error("録画開始エラー:", err);
+      alert("録画を開始できませんでした。画面共有の許可と、「タブの音声を共有」にチェックを入れているか確認してください。");
+    }
+  };
+
+  // ビジュアルコンポーネント
+  const RenderVisual = ({ type }) => {
+    if (type === "intro") return (
+      <div className="flex flex-col items-center justify-center h-72 animate-fade-in relative overflow-hidden">
+        <Zap size={64} className="absolute text-yellow-400 opacity-20 -top-4 -left-4 animate-spin-slow" />
+        <div className="bg-blue-500 text-white p-6 rounded-full w-48 h-48 flex items-center justify-center border-8 border-white shadow-2xl z-10 animate-bounce hover:scale-110 transition-transform">
+          <span className="text-7xl font-black drop-shadow-lg">卓球</span>
+        </div>
+        <div className="mt-8 text-2xl font-bold text-gray-600 bg-white/80 px-6 py-2 rounded-full shadow-sm">
+          タイムトラベルに出発！
+        </div>
+      </div>
+    );
+
+    if (type === "rain") return (
+      <div className="relative h-72 w-full bg-slate-700 rounded-2xl overflow-hidden border-4 border-slate-600 shadow-inner">
+         {[...Array(30)].map((_, i) => (
+           <div key={i} className="absolute bg-blue-300 w-1 rounded-full opacity-60"
+             style={{
+               height: `${Math.random() * 20 + 10}px`, left: `${Math.random() * 100}%`, top: `-${Math.random() * 20}px`,
+               animation: `rain ${Math.random() * 0.8 + 0.4}s linear infinite`
+             }}
+           />
+         ))}
+         <div className="absolute bottom-0 w-full flex justify-center items-end">
+           <div className="bg-amber-900 w-4/5 h-32 rounded-t-xl relative flex items-center justify-center shadow-2xl border-t-8 border-amber-800">
+              <span className="text-white font-black text-2xl drop-shadow-md bg-black/30 px-4 py-2 rounded">イギリスの食堂テーブル</span>
+           </div>
+         </div>
+         <style>{`@keyframes rain { 0% { transform: translateY(-20px); } 100% { transform: translateY(350px); } }`}</style>
+      </div>
+    );
+
+    if (type === "tools") return (
+      <div className="flex justify-around items-center h-72 bg-amber-100 rounded-2xl p-4 border-4 border-amber-200">
+        <div className="flex flex-col items-center animate-bounce">
+          <Box size={100} className="text-amber-800 mb-4 drop-shadow-lg" />
+          <span className="text-xl font-black text-white bg-amber-800 px-4 py-2 rounded-xl shadow-md">箱のフタ（ラケット）</span>
+        </div>
+        <div className="flex flex-col items-center animate-pulse">
+           <div className="w-24 h-24 bg-orange-200 rounded-full border-4 border-orange-400 flex items-center justify-center mb-4 shadow-lg">
+             <span className="text-lg text-orange-900 font-bold">コルク</span>
+           </div>
+          <span className="text-xl font-black text-white bg-orange-600 px-4 py-2 rounded-xl shadow-md">コルク（ボール）</span>
+        </div>
+      </div>
+    );
+
+    if (type === "sound") return (
+      <div className="flex flex-col items-center justify-center h-72 bg-emerald-100 rounded-2xl border-4 border-emerald-300">
+        <div className="flex items-center gap-12 z-10 bg-white p-8 rounded-3xl shadow-xl">
+           <div className="text-7xl font-black text-pink-500 animate-bounce" style={{animationDuration: '1s'}}>PING!</div>
+           <div className="w-6 h-6 bg-slate-800 rounded-full shadow-inner"></div>
+           <div className="text-7xl font-black text-cyan-500 animate-bounce delay-150" style={{animationDuration: '1s'}}>PONG!</div>
+        </div>
+      </div>
+    );
+
+    if (type === "japan") return (
+      <div className="flex flex-col items-center justify-center h-72 bg-rose-100 rounded-2xl border-4 border-rose-300 relative overflow-hidden">
+        <Globe size={160} className="absolute text-rose-200 -right-10 -bottom-10 animate-spin-slow" />
+        <div className="relative z-10 flex flex-col items-center bg-white/90 p-8 rounded-3xl shadow-xl">
+          <div className="w-40 h-40 bg-red-500 rounded-full flex items-center justify-center shadow-2xl animate-pulse">
+             <div className="w-36 h-36 bg-red-600 rounded-full border-8 border-yellow-300 flex items-center justify-center">
+                <span className="text-yellow-300 font-black text-2xl rotate-12">スポンジ!</span>
+             </div>
+          </div>
+          <div className="mt-8 flex gap-4">
+            <span className="bg-blue-600 text-white px-6 py-2 rounded-full text-xl font-black shadow-md">スピードUP!</span>
+            <span className="bg-green-600 text-white px-6 py-2 rounded-full text-xl font-black shadow-md">回転UP!</span>
+          </div>
+        </div>
+      </div>
+    );
+
+    if (type === "colors") return (
+      <div className="flex justify-center items-center h-72 bg-gray-200 rounded-2xl border-4 border-gray-400">
+        <div className="flex gap-8 bg-white p-8 rounded-3xl shadow-xl">
+          <div className="flex flex-col items-center animate-bounce" style={{animationDelay: '0s'}}>
+            <div className="w-32 h-32 bg-red-600 rounded-t-full border-b-8 border-yellow-800 mb-2 shadow-lg"></div>
+            <span className="font-black text-xl text-red-600">赤ラバー</span>
+          </div>
+          <div className="flex flex-col items-center animate-bounce" style={{animationDelay: '0.5s'}}>
+            <div className="w-32 h-32 bg-gray-900 rounded-t-full border-b-8 border-yellow-800 mb-2 shadow-lg"></div>
+            <span className="font-black text-xl text-gray-900">黒ラバー</span>
+          </div>
+        </div>
+      </div>
+    );
+
+    if (type === "ball_size") return (
+      <div className="flex justify-around items-end h-72 bg-sky-100 rounded-2xl border-4 border-sky-300 p-8">
+        <div className="flex flex-col items-center">
+          <div className="w-16 h-16 bg-white rounded-full border-2 border-gray-300 shadow-md mb-4 flex justify-center items-center">
+            <span className="text-xs font-bold text-gray-400">38mm</span>
+          </div>
+          <span className="font-bold text-gray-600 bg-white px-4 py-1 rounded-full">昔のボール</span>
+        </div>
+        <div className="text-4xl font-black text-blue-500 mb-12 animate-pulse">→</div>
+        <div className="flex flex-col items-center">
+          <div className="w-24 h-24 bg-orange-400 rounded-full border-2 border-orange-500 shadow-2xl mb-4 flex justify-center items-center animate-bounce">
+             <span className="text-sm font-black text-white drop-shadow-md">40mm+</span>
+          </div>
+          <span className="font-bold text-white bg-blue-600 px-4 py-1 rounded-full shadow-md">今のボール（見やすい！）</span>
+        </div>
+      </div>
+    );
+
+    if (type === "olympic") return (
+      <div className="flex flex-col items-center justify-center h-72 bg-blue-900 rounded-2xl border-4 border-blue-950">
+        <Trophy size={100} className="text-yellow-400 mb-6 drop-shadow-[0_0_15px_rgba(250,204,21,0.8)] animate-pulse" />
+        <div className="flex gap-6 mb-6 bg-white/10 p-4 rounded-full backdrop-blur-sm">
+          <div className="w-12 h-12 rounded-full border-4 border-blue-500"></div>
+          <div className="w-12 h-12 rounded-full border-4 border-yellow-400 mt-6"></div>
+          <div className="w-12 h-12 rounded-full border-4 border-white"></div>
+          <div className="w-12 h-12 rounded-full border-4 border-green-500 mt-6"></div>
+          <div className="w-12 h-12 rounded-full border-4 border-red-500"></div>
+        </div>
+        <div className="text-2xl font-black text-white tracking-widest drop-shadow-md">1988年 オリンピック種目へ</div>
+      </div>
+    );
+
+    if (type === "quiz") return (
+      <div className="flex flex-col items-center justify-center h-72 bg-purple-100 rounded-2xl border-4 border-purple-300 p-4">
+         <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-lg">
+           <h3 className="text-2xl font-black text-purple-800 mb-6 text-center border-b-4 border-purple-200 pb-2">
+             最初のラケットは何？
+           </h3>
+           <div className="flex flex-col gap-3">
+             <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-xl">
+               <span className="bg-gray-300 w-10 h-10 flex items-center justify-center rounded-full font-bold text-xl">1</span>
+               <span className="text-xl font-bold text-gray-700">🍳 フライパン</span>
+             </div>
+             <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-xl">
+               <span className="bg-gray-300 w-10 h-10 flex items-center justify-center rounded-full font-bold text-xl">2</span>
+               <span className="text-xl font-bold text-gray-700">🩴 スリッパ</span>
+             </div>
+             <div className="flex items-center gap-4 p-3 bg-red-100 border-4 border-red-400 rounded-xl animate-pulse">
+               <span className="bg-red-500 text-white w-10 h-10 flex items-center justify-center rounded-full font-black text-xl">3</span>
+               <span className="text-xl font-black text-red-700">📦 箱のフタ（正解！）</span>
+             </div>
+           </div>
+         </div>
+      </div>
+    );
+
+    return (
+      <div className="flex flex-col items-center justify-center h-72 bg-gradient-to-br from-orange-300 to-yellow-400 rounded-2xl border-4 border-orange-500 shadow-inner">
+        <Smile size={120} className="text-white mb-6 drop-shadow-lg animate-bounce" />
+        <h2 className="text-5xl font-black text-white drop-shadow-md tracking-wider">Enjoy Table Tennis!</h2>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-900 p-4 font-sans flex flex-col items-center justify-center">
+      
+      {/* 動画作成用コントロール */}
+      <div className="w-full max-w-5xl mb-4 bg-slate-800 p-4 rounded-xl flex flex-col md:flex-row justify-between items-center shadow-lg gap-4">
+        <div className="text-white font-bold flex items-center gap-2">
+          <MonitorPlay size={24} className="text-blue-400" />
+          動画作成モード {isRecording && <span className="text-red-500 animate-pulse">● 録画中... (終わるまでお待ちください)</span>}
+        </div>
+        
+        <div className="flex flex-wrap justify-center gap-4">
+          {/* 外部録画用の手動再生ボタン */}
+          <button 
+            onClick={toggleAutoPlay}
+            disabled={isRecording}
+            className={`flex items-center gap-2 px-6 py-2 rounded-full font-bold text-sm transition-all ${
+              isRecording ? 'opacity-50 cursor-not-allowed bg-gray-500 text-white' :
+              isAutoPlaying 
+                ? 'bg-red-500 text-white hover:bg-red-600 animate-pulse' 
+                : 'bg-green-500 text-white hover:bg-green-600 hover:scale-105 shadow-lg'
+            }`}
+          >
+            {isAutoPlaying && !isRecording ? (
+              <><Square size={20} /> 再生停止</>
+            ) : (
+              <><Play size={20} /> 再生のみ (外部録画用)</>
+            )}
+          </button>
+
+          {/* 自動録画・保存ボタン */}
+          {!isAutoPlaying && !isRecording ? (
+            <button 
+              onClick={startRecordingAndPlay}
+              className="flex items-center gap-2 px-6 py-2 rounded-full font-bold text-sm bg-blue-500 text-white hover:bg-blue-600 hover:scale-105 shadow-lg shadow-blue-500/30"
+            >
+              <Video size={20} /> ブラウザで録画して保存 (WebM)
+            </button>
+          ) : isRecording ? (
+             <button 
+              onClick={toggleAutoPlay}
+              className="flex items-center gap-2 px-6 py-2 rounded-full font-bold text-sm bg-red-600 text-white hover:bg-red-700 animate-pulse shadow-lg"
+            >
+              <Square size={20} /> 録画を強制停止
+            </button>
+          ) : null}
+        </div>
+      </div>
+
+      {/* 録画対象となるメインスクリーン */}
+      <div className="w-full max-w-5xl aspect-[16/9] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col relative">
+        
+        {/* 音声再生中インジケーター（右上に小さく表示） */}
+        {isSpeaking && (
+          <div className="absolute top-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full flex items-center gap-2 text-sm z-50">
+            <Volume2 size={16} className="animate-pulse" />
+            <span>音声再生中</span>
+          </div>
+        )}
+
+        {/* スライド本体 */}
+        <div className="flex-1 p-8 md:p-12 flex flex-col justify-between">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-500 mb-2">
+              シーン {currentScene + 1} / {scenes.length}
+            </h2>
+            <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-6 tracking-tight drop-shadow-sm">
+              {scenes[currentScene].title}
+            </h1>
+            <h2 className="text-2xl md:text-3xl font-black text-blue-600 bg-blue-50 inline-block px-6 py-2 rounded-full border-2 border-blue-200">
+              {scenes[currentScene].mainText}
+            </h2>
+          </div>
+
+          <div className="flex-1 flex items-center justify-center">
+             <div className="w-full max-w-3xl">
+                <RenderVisual type={scenes[currentScene].visualType} />
+             </div>
+          </div>
+          
+          {/* 録画画面に映る字幕としてのテキスト */}
+          <div className="mt-8 bg-gray-50 p-6 rounded-xl border-l-8 border-yellow-400 shadow-sm min-h-[120px] flex items-center">
+            <p className="text-xl md:text-2xl font-bold text-gray-800 leading-relaxed">
+              {scenes[currentScene].script}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 注意書き */}
+      <div className="text-gray-400 mt-4 text-sm text-center max-w-3xl bg-slate-800 p-4 rounded-lg">
+        <p className="font-bold text-yellow-400 mb-2">【ブラウザで録画して保存】の使い方</p>
+        <ul className="text-left list-disc list-inside space-y-1">
+          <li>ボタンを押すと画面共有の選択画面が出ます。<strong>「Chromeタブ（このタブ）」</strong>を選択してください。</li>
+          <li>必ず<strong>「タブの音声を共有する (Share tab audio)」にチェック</strong>を入れて「共有」を押してください。</li>
+          <li>最後まで再生されると、<strong>WebM形式の動画ファイル</strong>としてPCに自動ダウンロードされます。</li>
+          <li>※スマホや一部のブラウザでは動かない場合があります。その場合はPCをご使用ください。</li>
+        </ul>
+      </div>
+
+    </div>
+  );
+};
+
+export default TableTennisAutoAnimation;
+
+
+```

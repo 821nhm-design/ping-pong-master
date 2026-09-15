@@ -1,0 +1,348 @@
+import React, { useState, useEffect } from 'react';
+import { Play, ArrowRight, ArrowLeft, RotateCcw, Box, Trophy, Globe, Smile, Zap, Volume2 } from 'lucide-react';
+
+const TableTennisHistory = () => {
+  const [currentScene, setCurrentScene] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  // シナリオデータ（全8シーン）
+  const scenes = [
+    {
+      id: 0,
+      title: "はじまり",
+      mainText: "卓球の歴史アドベンチャーへようこそ！",
+      subText: "卓球っていつ、どこで生まれたの？\nみんなでタイムトラベルに出発だ！",
+      visualType: "intro",
+      script: "こんにちは！今日はみんなで「卓球の歴史」を探検しよう。卓球はいつ、どこで生まれたのかな？実は意外な場所なんだよ。さあ、タイムトラベルに出発だ！"
+    },
+    {
+      id: 1,
+      title: "1880年代：イギリス",
+      mainText: "雨の日の退屈しのぎ？",
+      subText: "昔のイギリスの貴族たちが\n「テニスをしたいけど雨だなぁ…」\nといって食堂のテーブルで始めました。",
+      visualType: "rain",
+      script: "今から約140年前、イギリスでのこと。テニスが大好きな人たちがいました。でも外は雨。「あーあ、テニスしたいな」…そこで誰かがひらめいた！「食堂のテーブルでテニスをすればいいじゃないか！」これが卓球の始まりなんです。"
+    },
+    {
+      id: 2,
+      title: "道具のびっくり進化",
+      mainText: "ラケットは箱のフタ！？",
+      subText: "最初はラケットもボールもありません。\n・ラケット → 葉巻（タバコ）の箱のフタ\n・ボール → シャンパンのコルク\n・ネット → 本を並べたもの",
+      visualType: "tools",
+      script: "最初は道具なんてありません。なんと、高級なタバコが入っていた「木の箱のフタ」をラケットにして、ワインのフタ（コルク）を丸めてボールにしていました。ネットの代わりには、分厚い本を並べていたんだって！びっくりだよね。"
+    },
+    {
+      id: 3,
+      title: "名前の由来",
+      mainText: "なんで「ピンポン」？",
+      subText: "昔は「ゴシマ」や「ウィフワフ」と呼ばれていました。\nでも、新しいボールの音を聞いて…\n「ピン！」「ポン！」",
+      visualType: "sound",
+      script: "昔は「ゴシマ」とか「ウィフ・ワフ」なんて変な名前で呼ばれていました。でもある時、中が空洞のボールが発明されました。打つと「ピン！」台につくと「ポン！」と音がする。そこから「ピンポン」と呼ばれるようになったんだよ。"
+    },
+    {
+      id: 4,
+      title: "1950年代：日本の大発明",
+      mainText: "日本が世界を変えた！",
+      subText: "それまでのラケットはボコボコしたゴムだけ。\n日本人が「スポンジ」を貼ることを発明！\nボールがものすごく速く、回転するようになった！",
+      visualType: "japan",
+      script: "それから少し時間が経って1950年代。日本人がすごい発明をしました。ラケットに「スポンジ」を貼ったのです。すると…ボールがものすごく速くなって、ギュンギュン回転がかかるようになりました！これで卓球がさらに面白いスポーツに進化したんだ。"
+    },
+    {
+      id: 5,
+      title: "オリンピック競技へ",
+      mainText: "世界中の人気スポーツに",
+      subText: "1988年のソウル大会から\nオリンピックの正式種目になりました。\n今では世界中で愛されています。",
+      visualType: "olympic",
+      script: "そして1988年、ついに卓球はオリンピックの正式なスポーツになりました。今では世界中の人が熱狂する、スピードと頭脳のスポーツになったんだね。"
+    },
+    {
+      id: 6,
+      title: "クイズ！",
+      mainText: "おさらいクイズ",
+      subText: "最初のラケットは何だったでしょう？\n\n1. フライパン\n2. スリッパ\n3. 箱のフタ",
+      visualType: "quiz",
+      script: "さあ、ここでおさらいクイズ！卓球が始まったばかりの頃、ラケットとして使われていたのは何だったでしょう？ 1番：フライパン、2番：スリッパ、3番：箱のフタ。……正解は、3番の「箱のフタ」でした！"
+    },
+    {
+      id: 7,
+      title: "まとめ",
+      mainText: "さあ、卓球を楽しもう！",
+      subText: "歴史を知ればもっと楽しい。\n今日はみんなで\n新しい歴史を作ろう！",
+      visualType: "ending",
+      script: "卓球の歴史、どうだったかな？雨の日の遊びから始まって、日本人の発明で進化して、今のオリンピック競技になったんだね。今日はみんなも、楽しみながらかっこいいプレーを見せてね！これで歴史のお話はおしまい！"
+    }
+  ];
+
+  const nextScene = () => {
+    if (currentScene < scenes.length - 1) {
+      setCurrentScene(currentScene + 1);
+    }
+  };
+
+  const prevScene = () => {
+    if (currentScene > 0) {
+      setCurrentScene(currentScene - 1);
+    }
+  };
+
+  const restart = () => {
+    setCurrentScene(0);
+  };
+
+  // ビジュアルコンポーネント
+  const RenderVisual = ({ type }) => {
+    if (type === "intro") {
+      return (
+        <div className="flex flex-col items-center justify-center h-64 animate-fade-in">
+          <div className="relative">
+            <div className="absolute -top-10 -left-10 text-yellow-400 animate-bounce">
+              <Zap size={48} />
+            </div>
+            <div className="bg-blue-500 text-white p-8 rounded-full w-40 h-40 flex items-center justify-center border-4 border-white shadow-lg z-10 relative">
+              <span className="text-6xl font-bold">卓</span>
+            </div>
+            <div className="absolute top-0 -right-20 animate-ping opacity-75">
+               <div className="bg-orange-400 rounded-full w-12 h-12"></div>
+            </div>
+            <div className="bg-red-500 text-white p-8 rounded-full w-40 h-40 flex items-center justify-center border-4 border-white shadow-lg absolute -bottom-10 -right-20">
+              <span className="text-6xl font-bold">球</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    if (type === "rain") {
+      return (
+        <div className="relative h-64 w-full bg-gray-200 rounded-xl overflow-hidden border-2 border-gray-300">
+           {/* 雨のアニメーション */}
+           {[...Array(20)].map((_, i) => (
+             <div 
+               key={i}
+               className="absolute bg-blue-400 w-1 rounded-full opacity-60"
+               style={{
+                 height: `${Math.random() * 20 + 10}px`,
+                 left: `${Math.random() * 100}%`,
+                 top: `-${Math.random() * 20}px`,
+                 animation: `rain ${Math.random() * 1 + 0.5}s linear infinite`
+               }}
+             />
+           ))}
+           <div className="absolute bottom-0 w-full flex justify-center items-end">
+             <div className="bg-amber-800 w-3/4 h-32 rounded-t-lg relative flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-xl drop-shadow-md">食堂のテーブル</span>
+                <div className="absolute -top-10">
+                  <span className="text-4xl">🎩 🌧️ 🎾</span>
+                </div>
+             </div>
+           </div>
+           <style>{`
+             @keyframes rain {
+               0% { transform: translateY(-20px); }
+               100% { transform: translateY(300px); }
+             }
+           `}</style>
+        </div>
+      );
+    }
+    if (type === "tools") {
+      return (
+        <div className="flex justify-around items-center h-64 bg-amber-50 rounded-xl p-4">
+          <div className="flex flex-col items-center animate-bounce-slow">
+            <Box size={80} className="text-amber-700 mb-2" />
+            <span className="font-bold text-amber-900 bg-amber-200 px-2 py-1 rounded">箱のフタ</span>
+          </div>
+          <div className="text-2xl font-bold text-gray-400">vs</div>
+          <div className="flex flex-col items-center animate-bounce-reverse">
+             <div className="w-16 h-16 bg-yellow-200 rounded-full border-4 border-yellow-600 flex items-center justify-center mb-2 shadow-md">
+               <span className="text-xs text-yellow-800 font-bold">CORK</span>
+             </div>
+            <span className="font-bold text-yellow-900 bg-yellow-200 px-2 py-1 rounded">コルク</span>
+          </div>
+        </div>
+      );
+    }
+    if (type === "sound") {
+      return (
+        <div className="flex flex-col items-center justify-center h-64 bg-green-50 rounded-xl relative overflow-hidden">
+          <div className="absolute left-10 top-10 animate-ping">
+            <Volume2 size={48} className="text-green-600"/>
+          </div>
+          
+          <div className="flex items-center gap-8 z-10">
+             <div className="text-6xl font-black text-orange-500 animate-pulse">PING!</div>
+             <div className="w-4 h-4 bg-black rounded-full"></div>
+             <div className="text-6xl font-black text-blue-500 animate-pulse delay-150">PONG!</div>
+          </div>
+          <div className="mt-4 text-gray-500 font-bold">音が名前になったんだ！</div>
+        </div>
+      );
+    }
+    if (type === "japan") {
+      return (
+        <div className="flex flex-col items-center justify-center h-64 bg-red-50 rounded-xl relative">
+          <div className="absolute top-4 right-4 text-red-500 opacity-20">
+            <Globe size={120} />
+          </div>
+          <div className="relative z-10 flex flex-col items-center">
+            <div className="relative">
+              <div className="w-32 h-32 bg-red-500 rounded-full flex items-center justify-center shadow-xl">
+                 <div className="w-28 h-28 bg-red-600 rounded-full border-4 border-yellow-200"></div>
+              </div>
+              <div className="absolute -bottom-2 -right-2 bg-yellow-400 text-red-800 font-bold px-3 py-1 rounded-full shadow-lg transform rotate-12">
+                SPONGE!
+              </div>
+            </div>
+            <div className="mt-6 flex gap-2">
+              <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse">Speed UP</span>
+              <span className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse">Spin UP</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    if (type === "olympic") {
+      return (
+        <div className="flex flex-col items-center justify-center h-64 bg-blue-50 rounded-xl">
+          <Trophy size={80} className="text-yellow-500 mb-4 drop-shadow-lg" />
+          <div className="flex gap-4 mb-4">
+            <div className="w-12 h-12 rounded-full bg-blue-500 opacity-80 animate-bounce" style={{animationDelay: '0s'}}></div>
+            <div className="w-12 h-12 rounded-full bg-yellow-400 opacity-80 animate-bounce" style={{animationDelay: '0.1s'}}></div>
+            <div className="w-12 h-12 rounded-full bg-black opacity-80 animate-bounce" style={{animationDelay: '0.2s'}}></div>
+            <div className="w-12 h-12 rounded-full bg-green-500 opacity-80 animate-bounce" style={{animationDelay: '0.3s'}}></div>
+            <div className="w-12 h-12 rounded-full bg-red-500 opacity-80 animate-bounce" style={{animationDelay: '0.4s'}}></div>
+          </div>
+          <div className="text-xl font-bold text-gray-700">1988年 ソウル大会</div>
+        </div>
+      );
+    }
+    if (type === "quiz") {
+      return (
+        <div className="flex flex-col items-center justify-center h-64 bg-purple-50 rounded-xl p-4">
+           <div className="text-6xl mb-4">❓</div>
+           <div className="bg-white p-4 rounded-lg shadow w-full max-w-md">
+             <div className="flex items-center gap-4 mb-2 p-2 hover:bg-purple-100 rounded cursor-pointer transition">
+               <span className="bg-purple-200 w-8 h-8 flex items-center justify-center rounded-full font-bold">1</span>
+               <span>🍳 フライパン</span>
+             </div>
+             <div className="flex items-center gap-4 mb-2 p-2 hover:bg-purple-100 rounded cursor-pointer transition">
+               <span className="bg-purple-200 w-8 h-8 flex items-center justify-center rounded-full font-bold">2</span>
+               <span>🩴 スリッパ</span>
+             </div>
+             <div className="flex items-center gap-4 p-2 bg-green-100 border-2 border-green-400 rounded cursor-pointer transition">
+               <span className="bg-green-500 text-white w-8 h-8 flex items-center justify-center rounded-full font-bold">3</span>
+               <span className="font-bold">📦 箱のフタ（正解！）</span>
+             </div>
+           </div>
+        </div>
+      );
+    }
+    return (
+      <div className="flex flex-col items-center justify-center h-64 bg-gradient-to-r from-orange-100 to-yellow-100 rounded-xl">
+        <Smile size={100} className="text-orange-500 mb-4" />
+        <h2 className="text-3xl font-bold text-orange-600">Enjoy Table Tennis!</h2>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-4 md:p-8 font-sans">
+      <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-blue-500">
+        
+        {/* ヘッダー */}
+        <div className="bg-blue-600 text-white p-4 flex justify-between items-center">
+          <div className="text-xl font-bold flex items-center gap-2">
+            <div className="w-3 h-3 bg-white rounded-full animate-ping"></div>
+            卓球ヒストリー・カミシバイ
+          </div>
+          <div className="text-sm font-mono bg-blue-800 px-3 py-1 rounded-full">
+            Scene: {currentScene + 1} / {scenes.length}
+          </div>
+        </div>
+
+        {/* メインスクリーンエリア */}
+        <div className="p-6 md:p-10 bg-gray-50 min-h-[400px] flex flex-col justify-between">
+          
+          {/* テキストコンテンツ */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl md:text-4xl font-black text-gray-800 mb-4 tracking-wider">
+              {scenes[currentScene].title}
+            </h1>
+            <h2 className="text-xl md:text-2xl font-bold text-blue-600 mb-6">
+              {scenes[currentScene].mainText}
+            </h2>
+            <div className="bg-white p-4 rounded-xl shadow-inner mx-auto max-w-2xl">
+              <p className="text-lg md:text-xl text-gray-600 whitespace-pre-line leading-relaxed">
+                {scenes[currentScene].subText}
+              </p>
+            </div>
+          </div>
+
+          {/* ビジュアル（アニメーション）エリア */}
+          <RenderVisual type={scenes[currentScene].visualType} />
+
+        </div>
+
+        {/* コントロールバー */}
+        <div className="bg-gray-800 p-4 flex justify-between items-center">
+          <button 
+            onClick={prevScene} 
+            disabled={currentScene === 0}
+            className={`flex items-center gap-2 px-6 py-3 rounded-full font-bold text-lg transition ${
+              currentScene === 0 
+                ? 'bg-gray-600 text-gray-400 cursor-not-allowed' 
+                : 'bg-white text-gray-800 hover:bg-gray-200 hover:scale-105 active:scale-95'
+            }`}
+          >
+            <ArrowLeft size={24} /> 戻る
+          </button>
+
+          {currentScene === scenes.length - 1 ? (
+             <button 
+             onClick={restart}
+             className="flex items-center gap-2 px-6 py-3 rounded-full font-bold text-lg bg-yellow-500 text-white hover:bg-yellow-400 hover:scale-105 transition animate-pulse"
+           >
+             <RotateCcw size={24} /> 最初から
+           </button>
+          ) : (
+            <div className="flex gap-2">
+               {/* 進行状況インジケーター */}
+               <div className="hidden md:flex gap-1 items-center mr-4">
+                 {scenes.map((s, idx) => (
+                   <div key={s.id} className={`w-3 h-3 rounded-full transition-all duration-300 ${idx === currentScene ? 'bg-blue-400 w-6' : 'bg-gray-600'}`}></div>
+                 ))}
+               </div>
+            </div>
+          )}
+
+          <button 
+            onClick={nextScene} 
+            disabled={currentScene === scenes.length - 1}
+            className={`flex items-center gap-2 px-6 py-3 rounded-full font-bold text-lg transition ${
+              currentScene === scenes.length - 1
+                ? 'bg-gray-600 text-gray-400 cursor-not-allowed' 
+                : 'bg-blue-500 text-white hover:bg-blue-400 hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/50'
+            }`}
+          >
+            次へ <ArrowRight size={24} />
+          </button>
+        </div>
+
+        {/* 先生用の台本エリア（録画時は隠してもOK） */}
+        <div className="bg-yellow-50 p-6 border-t-2 border-yellow-200">
+          <div className="flex items-center gap-2 mb-2 text-yellow-800 font-bold">
+            <Volume2 size={20} />
+            <span>先生のための読み上げ台本</span>
+          </div>
+          <div className="bg-white p-4 rounded-lg border border-yellow-200 text-gray-800 text-lg leading-loose shadow-sm">
+            {scenes[currentScene].script}
+          </div>
+          <p className="text-xs text-gray-400 mt-2 text-center">※この部分はPCで録画する際、範囲外にすると綺麗に動画になります。</p>
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
+export default TableTennisHistory;
+
