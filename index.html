@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Ping Pong Master - 卓球を楽しく学ぶための総合ガイド">
+  <title>Ping Pong Master</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --navy: #102a43;
+      --blue: #1f7ae0;
+      --sky: #eaf4ff;
+      --gold: #f4b942;
+      --text: #243b53;
+      --muted: #627d98;
+      --white: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif;
+      color: var(--text);
+      background: linear-gradient(180deg, var(--sky) 0, #fff 55%);
+      line-height: 1.7;
+    }
+    .container { width: min(1100px, calc(100% - 40px)); margin: 0 auto; }
+    header { padding: 22px 0; }
+    .brand { color: var(--navy); font-weight: 800; font-size: 1.15rem; letter-spacing: .04em; }
+    .hero { padding: 70px 0 85px; text-align: center; }
+    .ball { font-size: 4.2rem; filter: drop-shadow(0 8px 8px rgba(16,42,67,.14)); }
+    h1 { margin: 12px 0 16px; color: var(--navy); font-size: clamp(2.2rem, 6vw, 4.5rem); line-height: 1.15; }
+    .lead { max-width: 680px; margin: 0 auto 30px; color: var(--muted); font-size: 1.1rem; }
+    .buttons { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .button { display: inline-block; padding: 12px 22px; border-radius: 999px; text-decoration: none; font-weight: 700; transition: transform .2s, box-shadow .2s; }
+    .button:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(16,42,67,.16); }
+    .primary { color: var(--white); background: var(--blue); }
+    .secondary { color: var(--navy); background: var(--white); border: 1px solid #c9d8e8; }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; padding-bottom: 70px; }
+    .card { padding: 25px; background: rgba(255,255,255,.9); border: 1px solid #d9e7f5; border-radius: 18px; box-shadow: 0 8px 24px rgba(16,42,67,.06); }
+    .card-icon { font-size: 1.8rem; }
+    h2 { margin: 8px 0; color: var(--navy); font-size: 1.2rem; }
+    .card p { margin: 0; color: var(--muted); }
+    footer { padding: 24px 0 35px; color: var(--muted); text-align: center; font-size: .9rem; border-top: 1px solid #d9e7f5; }
+    @media (max-width: 700px) { .container { width: min(100% - 28px, 1100px); } .hero { padding: 45px 0 60px; } .cards { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container"><div class="brand">🏓 PING PONG MASTER</div></div>
+  </header>
+  <main>
+    <section class="hero container">
+      <div class="ball" aria-hidden="true">🏓</div>
+      <h1>卓球を、もっと深く<br>もっと楽しく。</h1>
+      <p class="lead">初心者から上級者まで、卓球の知識・技術・トレーニングを楽しく学べる Ping Pong Master へようこそ。</p>
+      <div class="buttons">
+        <a class="button primary" href="./app/">アプリを開く</a>
+        <a class="button secondary" href="https://github.com/821nhm-design/ping-pong-master" target="_blank" rel="noopener">プロジェクトを見る</a>
+      </div>
+    </section>
+    <section class="cards container" aria-label="Ping Pong Masterの特徴">
+      <article class="card"><div class="card-icon">📚</div><h2>卓球を学ぶ</h2><p>ルールや歴史、用具、基本技術をわかりやすく整理しています。</p></article>
+      <article class="card"><div class="card-icon">🎯</div><h2>実力を伸ばす</h2><p>初心者向けの練習から、体幹・戦術トレーニングまで段階的に学べます。</p></article>
+      <article class="card"><div class="card-icon">🧠</div><h2>クイズで挑戦</h2><p>卓球に関する問題に挑戦しながら、楽しんで知識を身につけられます。</p></article>
+    </section>
+  </main>
+  <footer><div class="container">© Ping Pong Master</div></footer>
+</body>
+</html>
